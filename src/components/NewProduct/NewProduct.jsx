@@ -1,4 +1,4 @@
-import "./newProduct.scss";
+import "./NewProduct.scss";
 
 import { RxCross2 } from "react-icons/rx";
 import { ArrowRight, CirclePlus } from "lucide-react";
