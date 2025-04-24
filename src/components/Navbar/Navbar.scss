@@ -1,0 +1,55 @@
+@use "../../styles/responsive.scss" as *;
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0px;
+  
+ .navbar-left{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+
+  &:hover{
+    p,.user-icon{
+      color: $primary-color;
+    }
+    .user-icon{
+      background: #fff;
+      border: 2px solid $primary-color;
+    }
+  }
+
+  .user-icon{
+    width: 40px;
+    height: 40px;
+    background: gray;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all .3s ease-in-out;
+    border: 2px solid transparent;
+  }
+
+  p{
+    font-size: 20px;
+    font-weight: bold;
+    transition: all .3s ease-in-out;
+  }
+ } 
+
+ .navbar-right{
+  button{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .login-icon{
+      width: 20px;
+      height: 20px;
+      font-weight: bold;
+    }
+  }
+ }
+}
