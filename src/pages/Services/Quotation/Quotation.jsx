@@ -1,4 +1,4 @@
-import "./Invoice.scss";
+import "./Quotation.scss";
 
 import { Plus, Search } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
@@ -106,7 +106,7 @@ const data = [
   },
 ];
 
-const Invoice = () => {
+const Quotation = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
 
@@ -215,21 +215,21 @@ const Invoice = () => {
         <CardInvoice
           setOpenInvoiceCard={setOpenInvoiceCard}
           onClose={() => setOpenInvoiceCard(false)}
-          title="Invoice"
-          dateName="Invoice"
+          title="Quotation"
+          dateName="Quotation"
         />
       )}
 
       <div className="invoice-top">
-        <h1>Invoice</h1>
-        <Link className="primary-btn" to={"/new-invoice"}>
-          <Plus size={20} /> Create Invoice
+        <h1>Quotations</h1>
+        <Link className="primary-btn" to={"/new-quotation"}>
+          <Plus size={20} /> Create Quotation
         </Link>
       </div>
 
       <div className="invoice-content">
         <div className="invoice-content-items">
-          {["All", "Pending", "Paid", "Cancelled", "Draft"].map((filter) => (
+          {["All", "Open", "Closed"].map((filter) => (
             <span
               key={filter}
               onClick={() => setActiveFilter(filter)}
@@ -338,4 +338,4 @@ const Invoice = () => {
   );
 };
 
-export default Invoice;
+export default Quotation;

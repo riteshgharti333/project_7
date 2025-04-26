@@ -1,4 +1,4 @@
-import "./Invoice.scss";
+import "./Customer.scss";
 
 import { Plus, Search } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
@@ -12,7 +12,8 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
-import CardInvoice from "../../../components/CardInvoice/CardInvoice";
+import NewCustomer from "../../../components/NewCustomer/NewCustomer";
+import CardCustomer from "../../../components/CardCustomer/CardCustomer";
 
 const weekOptions = [
   { value: "today", label: "Today" },
@@ -52,66 +53,47 @@ const data = [
   {
     _id: "1",
     name: "Amit Sharma",
-    email: "amit@example.com",
     phoneNumber: "9876543210",
-    createdAt: "2024-04-22T10:00:00Z",
-    amount: "₹4,200",
-    mode: "UPI",
-    status: "Paid",
-    billNo: "INV-1001",
-  },
-  {
-    _id: "2",
-    name: "Sara Khan",
-    email: "sara.khan@example.com",
-    phoneNumber: "9812345678",
+    balance: "₹4,200",
     createdAt: "2024-04-20T12:30:00Z",
-    amount: "₹2,500",
-    mode: "Cash",
-    status: "Pending",
-    billNo: "INV-1002",
   },
   {
-    _id: "3",
-    name: "Rohit Verma",
-    email: "rohit.verma@example.com",
-    phoneNumber: "9123456780",
-    createdAt: "2024-04-19T14:15:00Z",
-    amount: "₹1,850",
-    mode: "Card",
-    status: "Cancelled",
-    billNo: "INV-1003",
+    _id: "1",
+    name: "Amit Sharma",
+    phoneNumber: "9876543210",
+    balance: "₹4,200",
+    createdAt: "2024-04-20T12:30:00Z",
   },
   {
-    _id: "4",
-    name: "Nikita Joshi",
-    email: "nikita.j@example.com",
-    phoneNumber: "9012345678",
-    createdAt: "2024-04-18T08:45:00Z",
-    amount: "₹3,600",
-    mode: "UPI",
-    status: "Paid",
-    billNo: "INV-1004",
+    _id: "1",
+    name: "Amit Sharma",
+    phoneNumber: "9876543210",
+    balance: "₹4,200",
+    createdAt: "2024-04-20T12:30:00Z",
   },
   {
-    _id: "5",
-    name: "Manoj Mehta",
-    email: "manoj.m@example.com",
-    phoneNumber: "9998887777",
-    createdAt: "2024-04-16T11:20:00Z",
-    amount: "₹5,000",
-    mode: "Bank Transfer",
-    status: "Draft",
-    billNo: "INV-1005",
+    _id: "1",
+    name: "Amit Sharma",
+    phoneNumber: "9876543210",
+    balance: "₹4,200",
+    createdAt: "2024-04-20T12:30:00Z",
+  },
+  {
+    _id: "1",
+    name: "Amit Sharma",
+    phoneNumber: "9876543210",
+    balance: "₹4,200",
+    createdAt: "2024-04-20T12:30:00Z",
   },
 ];
 
-const Invoice = () => {
+const Customer = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
 
-  const [openInvoiceCard, setOpenInvoiceCard] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState(null);
+    const [openCustomerCard , setOpenCustomerCard] = useState(false);
+
+    const [selectedInvoice, setSelectedInvoice] = useState(null);
 
   const [selectedRange, setSelectedRange] = useState(weekOptions[1]); // default to "This Week"
 
@@ -129,50 +111,22 @@ const Invoice = () => {
   const columns = useMemo(
     () => [
       {
-        accessorKey: "amount",
-        header: "Amount",
-        cell: (info) => info.getValue(),
-      },
-      {
-        accessorKey: "billNo",
-        header: "Bill No",
-        cell: (info) => info.getValue(),
-      },
-      {
         accessorKey: "name",
         header: "Name",
         cell: (info) => info.getValue(),
       },
       {
-        accessorKey: "mode",
-        header: "Payment Mode",
+        accessorKey: "phoneNumber",
+        header: "Phone Number",
         cell: (info) => info.getValue(),
       },
+
       {
-        accessorKey: "status",
-        header: "Status",
-        cell: (info) => {
-          const value = info.getValue();
-          const color =
-            value === "Paid"
-              ? "green"
-              : value === "Pending"
-              ? "#f39c12"
-              : value === "Cancelled"
-              ? "red"
-              : "gray";
-          return (
-            <span
-              style={{
-                color,
-                fontWeight: 600,
-              }}
-            >
-              {value}
-            </span>
-          );
-        },
+        accessorKey: "balance",
+        header: "Closing Balance",
+        cell: (info) => info.getValue(),
       },
+
       {
         accessorKey: "createdAt",
         header: "Date",
@@ -202,50 +156,37 @@ const Invoice = () => {
     },
   });
 
-  const handleRowClick = (invoice) => {
-    console.log("Row clicked:", invoice);
+  const handleRowClick = (customer) => {
+    setOpenCustomerCard(true);
+    setSelectedInvoice(customer);
 
-    setSelectedInvoice(invoice);
-    setOpenInvoiceCard(true);
   };
 
-  return (
-    <div className="invoice">
-      {openInvoiceCard && (
-        <CardInvoice
-          setOpenInvoiceCard={setOpenInvoiceCard}
-          onClose={() => setOpenInvoiceCard(false)}
-          title="Invoice"
-          dateName="Invoice"
-        />
-      )}
+  const [openCustomer, setOpenCustomer] = useState(false);
 
-      <div className="invoice-top">
-        <h1>Invoice</h1>
-        <Link className="primary-btn" to={"/new-invoice"}>
-          <Plus size={20} /> Create Invoice
-        </Link>
+  return (
+    <div className="customer">
+      {openCustomer && <NewCustomer setOpenCustomer={setOpenCustomer} />}
+
+      {openCustomerCard && <CardCustomer setOpenCustomerCard={setOpenCustomerCard} />}
+      <div className="customer-top">
+        <h1>Customers</h1>
+        <button className="primary-btn" onClick={() => setOpenCustomer(true)}>
+          <Plus size={20} /> New Customer
+        </button>
       </div>
 
-      <div className="invoice-content">
-        <div className="invoice-content-items">
-          {["All", "Pending", "Paid", "Cancelled", "Draft"].map((filter) => (
-            <span
-              key={filter}
-              onClick={() => setActiveFilter(filter)}
-              className={activeFilter === filter ? "active-filter" : ""}
-            >
-              {filter === "All" ? "All Transactions" : filter}
-            </span>
-          ))}
+      <div className="customer-content">
+        <div className="customer-content-items">
+          <span className="active-filter">All Customers</span>
         </div>
-
-        <div className="invoice-content-inputs">
-          <div className="invoice-content-inputs-search">
+        {/* 
+        <div className="customer-content-inputs">
+          <div className="customer-content-inputs-search">
             <Search className="search-icon" />
             <input type="search" placeholder="search by customer..." />
           </div>
-          <div className="invoice-content-inputs-week">
+          <div className="customer-content-inputs-week">
             <Select
               options={weekOptions}
               value={selectedRange}
@@ -259,7 +200,7 @@ const Invoice = () => {
               }}
             />
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className="table">
@@ -303,39 +244,52 @@ const Invoice = () => {
           </tbody>
         </table>
 
-        <div className="pagination">
-          <button
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            First
-          </button>
-          <button
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            ◀ Prev
-          </button>
-          <span className="page">
-            Page {table.getState().pagination.pageIndex + 1} of{" "}
-            {table.getPageCount()}
-          </span>
-          <button
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next ▶
-          </button>
-          <button
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            Last
-          </button>
+        <div className="table-bottom">
+          <div className="table-bottom-desc">
+            <div className="table-bottom-desc-item">
+              <span>You Pay</span>
+              <span>₹0.00</span>
+            </div>
+            <div className="table-bottom-desc-item">
+              <span>Your Collect</span>
+              <span>₹0.00</span>
+            </div>
+          </div>
+
+          <div className="customer-pagination">
+            <button
+              onClick={() => table.setPageIndex(0)}
+              disabled={!table.getCanPreviousPage()}
+            >
+              First
+            </button>
+            <button
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              ◀ Prev
+            </button>
+            <span className="page">
+              Page {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getPageCount()}
+            </span>
+            <button
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next ▶
+            </button>
+            <button
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              disabled={!table.getCanNextPage()}
+            >
+              Last
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default Invoice;
+export default Customer;

@@ -1,0 +1,160 @@
+@use "../../styles/responsive.scss" as *;
+
+.report {
+  padding: 10px;
+  .report-top {
+    .report-top-left {
+      display: flex;
+      align-items: center;
+
+      h3 {
+        font-size: 20px;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .report-content {
+    display: flex;
+    background: #fff;
+    margin-top: 20px;
+    border-radius: 5px;
+
+    .report-content-sidebar {
+      width: 250px;
+      padding: 1rem;
+      border-right: 1px solid #ddd;
+      height: 100vh;
+      overflow-y: auto;
+
+      .sidebar-group {
+        margin-bottom: 10px;
+      }
+
+      .sidebar-item {
+        display: flex;
+        justify-content: space-between;
+        cursor: pointer;
+        font-weight: 500;
+        padding: 5px;
+        transition: all 0.2s;
+
+        &:hover {
+          color: $primary-color;
+        }
+      }
+
+      .sidebar-subitems {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease, padding 0.4s ease;
+        padding-left: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        font-size: 16px;
+
+        p {
+          cursor: pointer;
+          color: $secondary-color;
+          padding: 4px 0;
+          font-weight: bold;
+          transition: all 0.2s ease-in-out;
+
+          &:hover {
+            color: #000;
+          }
+        }
+      }
+
+      .sidebar-subitems.open {
+        max-height: 500px; // large enough for 3–4 items
+        padding-top: 0.5rem;
+      }
+    }
+
+    .report-content-right {
+        flex-grow: 1;
+      .report-table {
+        width: 100%;
+        background: white;
+        border-radius: 5px;
+        overflow-x: auto;
+        height: 80vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          text-align: left;
+
+          th {
+            color: $secondary-color;
+            padding: 12px;
+            font-weight: bold;
+            cursor: pointer;
+          }
+
+          td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            font-weight: bold;
+          }
+
+          tr:hover {
+            background: rgba(0, 70, 253, 0.1);
+          }
+        }
+      }
+
+      .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+        align-items: center;
+
+        .page {
+          margin: 0px 20px;
+        }
+
+        button {
+          background: #0046fd;
+          color: white;
+          border: none;
+          padding: 8px 12px;
+          margin: 0 5px;
+          border-radius: 5px;
+          cursor: pointer;
+
+          &:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+          }
+        }
+      }
+
+      .status {
+        padding: 4px 8px;
+        border-radius: 5px;
+        font-weight: bold;
+
+        &.active {
+          background: #d4edda;
+          color: #155724;
+        }
+
+        &.inactive {
+          background: #f8d7da;
+          color: #721c24;
+        }
+
+        &.pending {
+          background: #fff3cd;
+          color: #856404;
+        }
+      }
+    }
+  }
+}

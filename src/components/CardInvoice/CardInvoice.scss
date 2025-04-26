@@ -1,0 +1,191 @@
+@use "../../styles/responsive.scss" as *;
+
+.cardInvoice {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: flex;
+  justify-content: flex-end;
+  .cardInvoice-container {
+    background: #f1f1f1;
+    width: 800px;
+    height: 100%;
+    transition: transform 0.3s ease;
+    padding: 20px;
+    overflow-y: auto;
+
+    .cardInvoice-top {
+      display: flex;
+      justify-content: space-between;
+      .cardInvoice-top-left {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        .cross-icon {
+          font-size: 30px;
+          stroke-width: 1;
+          color: $secondary-color;
+          cursor: pointer;
+        }
+      }
+      button {
+        display: flex;
+        gap: 5px;
+      }
+    }
+
+    .cardInvoice-desc {
+      margin-top: 30px;
+      .details {
+        font-weight: bold;
+        color: $secondary-color;
+      }
+
+      .cardInvoice-content {
+        .cardInvoice-content-left {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-top: 20px;
+          .cardInvoice-content-left-item {
+            .invoice-name {
+              background: #b5fdff;
+              padding: 15px;
+              font-size: 18x;
+              font-weight: bold;
+              border-radius: 50%;
+              letter-spacing: 1px;
+            }
+          }
+
+          .cardInvoice-content-left-item2 {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            .cardInvoice-content-left-item2-item {
+              display: flex;
+              gap: 30px;
+
+              p {
+                font-weight: 500;
+                display: flex;
+                gap: 10px;
+                color: $secondary-color;
+                span {
+                  font-weight: bold;
+                  color: #000;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .cardInvoice-price {
+      margin-top: 30px;
+
+      h3 {
+        font-size: 30px;
+        margin-bottom: 20px;
+      }
+      .cardInvoice-price-customer {
+        .cardInvoice-table {
+          width: 100%;
+          border-collapse: collapse;
+          table-layout: fixed;
+          td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            font-size: 14px;
+
+            &:last-child {
+              font-weight: bold;
+            }
+          }
+
+          tr td:first-child {
+            width: 20%;
+          }
+
+          tr td:last-child {
+            width: 80%;
+          }
+        }
+      }
+
+      .cardInvoice-product-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed; 
+        margin-top: 30px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      
+        th, td {
+          // 
+          padding: 10px;
+          font-size: 14px;
+          text-align: center;
+        }
+      
+        th {
+          background-color: #f5f5f5;
+          font-weight: bold;
+          color: $secondary-color;
+        }
+      
+        td {
+          &:last-child {
+            font-weight: bold;
+          }
+        }
+      
+        tr td:first-child {
+          width: 30%; // 3 parts out of 10 (3/10)
+        }
+      
+        tr td:nth-child(2) {
+          width: 20%; // 2 parts out of 10 (2/10)
+        }
+      
+        tr td:nth-child(3) {
+          width: 20%; // 2 parts out of 10 (2/10)
+        }
+      
+        tr td:last-child {
+          width: 30%; // 3 parts out of 10 (3/10)
+        }
+      }
+
+    .cardInvoice-total-amount{
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      margin-top: 30px;
+      gap: 10px;
+
+      .cardInvoice-total-amount-item{
+        display: flex;
+        gap: 30px;
+        font-size: 20px;
+        font-weight: bold;
+
+        &:first-child{
+          color: $secondary-color;
+          font-weight: bold;
+          font-size: 16px;
+        }
+
+
+      }
+    }
+       
+    }
+  }
+}

@@ -29,8 +29,8 @@ export const sidebarItems = [
 
   {
     icon: MonitorCog,
-    title: "Quotation System",
-    link: "quotation-system",
+    title: "Quotation",
+    link: "quotation",
   },
   {
     icon: UsersRound,
@@ -45,8 +45,8 @@ export const sidebarItems = [
   },
   {
     icon: ShoppingCart,
-    title: "Add Product",
-    link: "add-product",
+    title: "Product",
+    link: "product",
   },
   {
     icon: BadgePercent,
@@ -62,5 +62,52 @@ export const tableData = [
     item_name: "Apple Box",
     item_qt: "2",
     item_unit_price: "2000",
+  },
+];
+
+
+
+
+
+export const reportData = [
+  {
+    title: "Import Data",
+    subItems: ["Sales", "Purchases", "Expenses"],
+  },
+  {
+    title: "Export Data",
+    subItems: ["Invoices", "Product List", "Transactions"],
+  },
+  {
+    title: "Sales Report",
+    subItems: ["Daily Sales", "Monthly Sales", "Customer Wise"],
+  },
+  {
+    title: "Purchase Report",
+    subItems: ["Vendor Wise", "Monthly Purchase", "GST Summary"],
+  },
+  {
+    title: "Stock Report",
+    subItems: ["Current Stock", "Low Stock", "Expired Stock"],
+  },
+  {
+    title: "Tax Report",
+    subItems: ["GST", "TDS", "VAT"],
+  },
+  {
+    title: "Employee Report",
+    subItems: ["Attendance", "Salary", "Performance"],
+  },
+  {
+    title: "Customer Report",
+    subItems: ["Top Customers", "Feedback", "Returns"],
+  },
+  {
+    title: "Financial Report",
+    subItems: ["Profit & Loss", "Balance Sheet", "Cash Flow"],
+  },
+  {
+    title: "Activity Logs",
+    subItems: ["Login Logs", "Action Logs", "Error Logs"],
   },
 ];

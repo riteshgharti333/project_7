@@ -1,0 +1,155 @@
+@use "../../styles/responsive.scss" as *;
+
+.cardCustomer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: flex;
+  justify-content: flex-end;
+  .cardCustomer-container {
+    background: #f1f1f1;
+    width: 800px;
+    height: 100%;
+    transition: transform 0.3s ease;
+    padding: 20px;
+    overflow-y: auto;
+
+    .cardCustomer-top {
+      display: flex;
+      justify-content: space-between;
+      .cardCustomer-top-left {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        .cross-icon {
+          font-size: 30px;
+          stroke-width: 1;
+          color: $secondary-color;
+          cursor: pointer;
+        }
+      }
+      button {
+        display: flex;
+        gap: 5px;
+      }
+    }
+
+    .cardCustomer-desc {
+      margin-top: 30px;
+      .details {
+        font-weight: bold;
+        color: $secondary-color;
+      }
+
+      .cardCustomer-content {
+        .cardCustomer-content-left {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-top: 20px;
+          .cardCustomer-content-left-item {
+            .invoice-name {
+              background: #b5fdff;
+              padding: 15px;
+              font-size: 18x;
+              font-weight: bold;
+              border-radius: 50%;
+              letter-spacing: 1px;
+            }
+          }
+
+          .cardCustomer-content-left-item2 {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            .cardCustomer-content-left-item2-item {
+              display: flex;
+              gap: 30px;
+
+              p {
+                font-weight: 500;
+                display: flex;
+                gap: 10px;
+                color: $secondary-color;
+                span {
+                  font-weight: bold;
+                  color: #000;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .cardCustomer-price {
+      margin-top: 30px;
+
+      h3 {
+        font-size: 30px;
+        margin-bottom: 20px;
+      }
+
+      .cardCustomer-product-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+        font-size: 14px;
+
+        th,
+        td {
+          padding: 10px;
+          border: none; 
+        }
+
+        thead {
+          background-color: #f9f9f9;
+          font-weight: bold;
+        }
+
+        tbody tr:nth-child(even) {
+          background-color: #fafafa;
+        }
+
+        button {
+          padding: 6px 12px;
+          border: none;
+          background-color: rgb(233, 16, 16);
+          color: white;
+          border-radius: 4px;
+          cursor: pointer;
+
+          &:hover {
+            background-color: rgba(255, 0, 0, 0.938);
+          }
+        }
+      }
+
+      .cardCustomer-total-amount {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        margin-top: 30px;
+        gap: 10px;
+
+        .cardCustomer-total-amount-item {
+          display: flex;
+          gap: 30px;
+          font-size: 20px;
+          font-weight: bold;
+
+          &:first-child {
+            color: $secondary-color;
+            font-weight: bold;
+            font-size: 16px;
+          }
+        }
+      }
+    }
+  }
+}
