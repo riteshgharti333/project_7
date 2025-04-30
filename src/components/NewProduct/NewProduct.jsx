@@ -2,10 +2,55 @@ import "./NewProduct.scss";
 
 import { RxCross2 } from "react-icons/rx";
 import { ArrowRight, CirclePlus } from "lucide-react";
+import { baseUrl } from "../../main";
+import axios from "axios";
+import LoadingButton from "../LoadingButton/LoadingButton";
+import { useState } from "react";
+import { toast } from "sonner";
 
-const NewProduct = ({ setOpenProduct }) => {
+const NewProduct = ({ setOpenProduct, handleProductData }) => {
   const handleClose = () => {
     setOpenProduct(false);
+  };
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [productData, setProductData] = useState({
+    name: "",
+    price: "",
+    unit: "",
+    discount: "",
+    totalAmount: "",
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setProductData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await axios.post(
+        `${baseUrl}/product/new-product`,
+        productData
+      );
+
+      if (data && data.product) {
+        toast.success(data.message);
+        setOpenProduct(false);
+        handleProductData(data.product);
+      }
+      handleClose();
+    } catch (error) {
+      console.error("Error saving product data", error);
+      toast.error(error.response.data.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -20,9 +65,9 @@ const NewProduct = ({ setOpenProduct }) => {
             <h2>Add Product</h2>
           </div>
 
-          <button className="primary-btn" onClick={handleClose}>
+          <LoadingButton isLoading={isLoading} onClick={handleSave}>
             Save Product <ArrowRight size={20} />
-          </button>
+          </LoadingButton>
         </div>
 
         <div className="newProduct-form">
@@ -32,21 +77,38 @@ const NewProduct = ({ setOpenProduct }) => {
               <label htmlFor="">
                 <span>*</span>Name
               </label>
-              <input type="text" name="" id="" placeholder="item name..." />
+              <input
+                type="text"
+                name="name"
+                id=""
+                placeholder="item name..."
+                value={productData.name}
+                onChange={handleInputChange}
+                required
+              />
             </div>
             <div className="form-group">
               <label htmlFor="">Selling Price</label>
               <input
                 type="number"
-                name=""
+                name="price"
                 id=""
                 placeholder="selling price..."
+                value={productData.price}
+                onChange={handleInputChange}
               />
             </div>
 
             <div className="form-group">
               <label htmlFor="">Pimary Unit</label>
-              <input type="number" name="" id="" placeholder="unit..." />
+              <input
+                type="number"
+                name="unit"
+                id=""
+                placeholder="unit..."
+                value={productData.unit}
+                onChange={handleInputChange}
+              />
             </div>
           </form>
         </div>

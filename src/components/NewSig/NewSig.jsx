@@ -1,52 +1,98 @@
+import { useState } from "react";
 import "./NewSig.scss";
-
 import { RxCross2 } from "react-icons/rx";
-import { ArrowRight, CirclePlus } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { FaPlus } from "react-icons/fa";
+import axios from "axios";
+import { baseUrl } from "../../main";
+import { toast } from "sonner";
+import LoadingButton from "../LoadingButton/LoadingButton";
 
-const NewSig = ({ setOpensig }) => {
+const NewSig = ({ setOpensig, handleSigData }) => {
+  const [signatureName, setSignatureName] = useState("");
+  const [signatureImage, setSignatureImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleClose = () => {
     setOpensig(false);
+  };
+
+  const handleSubmit = async () => {
+    if (!signatureName || !signatureImage) {
+      toast.error("Please enter a signature name and upload a file.");
+      return;
+    }
+
+    setIsLoading(true);
+    const formData = new FormData();
+    formData.append("signatureName", signatureName);
+    formData.append("signatureImage", signatureImage);
+
+    try {
+      const { data } = await axios.post(
+        `${baseUrl}/signature/new-signature`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      toast.success("Signature added successfully!");
+      handleSigData(data.signature);
+      setOpensig(false);
+    } catch (err) {
+      toast.error("Upload failed. Try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="newSig">
       <div className="newSig-container">
         <div className="newSig-top">
-          <div className="newSig-top-left">
-            <RxCross2
-              className="cross-icon"
-              onClick={handleClose} // Cross icon click
-            />
+          <div className="newSig-top-left" onClick={handleClose}>
+            <RxCross2 className="cross-icon" />
             <h2>Signature Details</h2>
           </div>
 
-          <button className="primary-btn" onClick={handleClose}>
-            Save & Update <ArrowRight size={20} />
-          </button>
+          <div onClick={handleSubmit}>
+            <LoadingButton isLoading={isLoading}>
+              Save <ArrowRight size={20} />
+            </LoadingButton>
+          </div>
         </div>
 
         <div className="newSig-form">
-          <form action="">
+          <form onSubmit={(e) => e.preventDefault()}>
             <div className="form-group">
-              <label htmlFor="">
+              <label htmlFor="signatureName">
                 <span>*</span>Signature Name
               </label>
               <input
                 type="text"
-                name=""
-                id=""
-                placeholder="signature name..."
+                id="signatureName"
+                placeholder="Signature name..."
+                value={signatureName}
+                onChange={(e) => setSignatureName(e.target.value)}
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="">
+              <label htmlFor="signatureImage">
                 <span>*</span> Upload
               </label>
               <div className="add-sig">
                 <FaPlus />
-                <p>Upload signature</p>
+                <input
+                  type="file"
+                  id="signatureImage"
+                  accept="image/*"
+                  onChange={(e) => setSignatureImage(e.target.files[0])}
+                />
+                <p>
+                  {signatureImage ? signatureImage.name : "Upload signature"}
+                </p>
               </div>
             </div>
           </form>

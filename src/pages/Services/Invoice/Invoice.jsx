@@ -11,8 +11,13 @@ import {
   getPaginationRowModel,
   flexRender,
 } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CardInvoice from "../../../components/CardInvoice/CardInvoice";
+
+import axios from "axios";
+import { baseUrl } from "../../../main";
+import PDF from "../../../components/PDF/PDF";
+import { PDFViewer } from "@react-pdf/renderer";
 
 const weekOptions = [
   { value: "today", label: "Today" },
@@ -20,6 +25,7 @@ const weekOptions = [
   { value: "last_week", label: "Last Week" },
   { value: "this_month", label: "This Month" },
   { value: "last_month", label: "Last Month" },
+  { value: "last_year", label: "Last Year" }, // Added Last Year option
 ];
 
 const customStyles = {
@@ -48,64 +54,6 @@ const customStyles = {
   }),
 };
 
-const data = [
-  {
-    _id: "1",
-    name: "Amit Sharma",
-    email: "amit@example.com",
-    phoneNumber: "9876543210",
-    createdAt: "2024-04-22T10:00:00Z",
-    amount: "₹4,200",
-    mode: "UPI",
-    status: "Paid",
-    billNo: "INV-1001",
-  },
-  {
-    _id: "2",
-    name: "Sara Khan",
-    email: "sara.khan@example.com",
-    phoneNumber: "9812345678",
-    createdAt: "2024-04-20T12:30:00Z",
-    amount: "₹2,500",
-    mode: "Cash",
-    status: "Pending",
-    billNo: "INV-1002",
-  },
-  {
-    _id: "3",
-    name: "Rohit Verma",
-    email: "rohit.verma@example.com",
-    phoneNumber: "9123456780",
-    createdAt: "2024-04-19T14:15:00Z",
-    amount: "₹1,850",
-    mode: "Card",
-    status: "Cancelled",
-    billNo: "INV-1003",
-  },
-  {
-    _id: "4",
-    name: "Nikita Joshi",
-    email: "nikita.j@example.com",
-    phoneNumber: "9012345678",
-    createdAt: "2024-04-18T08:45:00Z",
-    amount: "₹3,600",
-    mode: "UPI",
-    status: "Paid",
-    billNo: "INV-1004",
-  },
-  {
-    _id: "5",
-    name: "Manoj Mehta",
-    email: "manoj.m@example.com",
-    phoneNumber: "9998887777",
-    createdAt: "2024-04-16T11:20:00Z",
-    amount: "₹5,000",
-    mode: "Bank Transfer",
-    status: "Draft",
-    billNo: "INV-1005",
-  },
-];
-
 const Invoice = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
@@ -113,68 +61,107 @@ const Invoice = () => {
   const [openInvoiceCard, setOpenInvoiceCard] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
 
-  const [selectedRange, setSelectedRange] = useState(weekOptions[1]); // default to "This Week"
+  const [selectedRange, setSelectedRange] = useState(weekOptions[5]); // Default set to "Last Year"
+
+  const [openPdf, setOpenPdf] = useState(false);
+
+  /////////////////////////
+
+  const [invoiceData, setInvoiceData] = useState();
+
+  useEffect(() => {
+    const getAllInvoice = async () => {
+      try {
+        const { data } = await axios.get(`${baseUrl}/invoice/all-invoices`);
+        if (data && data.invoices) {
+          console.log(data);
+          setInvoiceData(data.invoices);
+        }
+      } catch (error) {
+        console.error("Error fetching invoices:", error);
+      }
+    };
+    getAllInvoice();
+  }, []);
 
   const handleWeekChange = (option) => {
     setSelectedRange(option);
-    // Optional: apply filtering logic here
     console.log("Filter by:", option.value);
   };
 
   const filteredData = useMemo(() => {
-    if (activeFilter === "All") return data;
-    return data.filter((item) => item.status === activeFilter);
-  }, [activeFilter]);
+    if (!invoiceData) return [];
+    if (activeFilter === "All") return invoiceData;
+    return invoiceData.filter((item) => {
+      const payment = item.payments?.[0];
+      const paymentStatus = payment
+        ? payment.isFullyPaid
+          ? "Paid"
+          : "Pending"
+        : "Pending";
+      return paymentStatus === activeFilter;
+    });
+  }, [activeFilter, invoiceData]);
 
   const columns = useMemo(
     () => [
       {
-        accessorKey: "amount",
+        accessorKey: "totalAmount",
         header: "Amount",
-        cell: (info) => info.getValue(),
+        cell: (info) => {
+          const products = info.row.original.products;
+          const total = products.reduce(
+            (acc, curr) => acc + curr.totalAmount,
+            0
+          );
+          return `₹${total}`;
+        },
       },
       {
-        accessorKey: "billNo",
+        accessorKey: "_id",
         header: "Bill No",
-        cell: (info) => info.getValue(),
+        cell: (info) => info.getValue().slice(-6).toUpperCase(), // last 6 chars of ID
       },
       {
-        accessorKey: "name",
+        accessorKey: "customer.name",
         header: "Name",
-        cell: (info) => info.getValue(),
+        cell: (info) => info.row.original.customer?.name || "N/A",
       },
       {
-        accessorKey: "mode",
         header: "Payment Mode",
-        cell: (info) => info.getValue(),
+        cell: (info) => info.row.original.payments?.[0]?.mode || "N/A",
       },
       {
-        accessorKey: "status",
+        accessorKey: "status", // Assuming you're using "status" in your row data
         header: "Status",
         cell: (info) => {
-          const value = info.getValue();
+          const value = info.getValue(); // Get the status value
+
+          // If status is not defined, determine it based on payment data
+          const payment = info.row.original.payments?.[0]; // Get the first payment
+          const paymentStatus = payment
+            ? payment.isFullyPaid
+              ? "Paid"
+              : "Pending"
+            : "Pending"; // Default to "Pending" if no payments are available
+
+          // Set color based on the payment status
           const color =
-            value === "Paid"
+            paymentStatus === "Paid"
               ? "green"
-              : value === "Pending"
+              : paymentStatus === "Pending"
               ? "#f39c12"
-              : value === "Cancelled"
+              : paymentStatus === "Cancelled"
               ? "red"
               : "gray";
+
           return (
-            <span
-              style={{
-                color,
-                fontWeight: 600,
-              }}
-            >
-              {value}
-            </span>
+            <span style={{ color, fontWeight: 600 }}>{paymentStatus}</span>
           );
         },
       },
       {
-        accessorKey: "createdAt",
+        accessorKey: "invoiceDate",
         header: "Date",
         cell: (info) => {
           const date = new Date(info.getValue());
@@ -183,6 +170,31 @@ const Invoice = () => {
             month: "short",
             year: "numeric",
           });
+        },
+      },
+      {
+        header: "View",
+        cell: (info) => {
+          return (
+            <div className="view-section">
+              <span
+                onClick={() => {
+                  setOpenInvoiceCard(true);
+                  setSelectedInvoice(info.row.original);
+                }}
+                className="view-link"
+              >
+                Invoice
+              </span>
+              <br />
+              <Link
+                to={`/invoice/${info.row.original._id}`}
+                className="view-link"
+              >
+                View
+              </Link>
+            </div>
+          );
         },
       },
     ],
@@ -211,6 +223,7 @@ const Invoice = () => {
 
   return (
     <div className="invoice">
+
       {openInvoiceCard && (
         <CardInvoice
           setOpenInvoiceCard={setOpenInvoiceCard}
@@ -229,7 +242,15 @@ const Invoice = () => {
 
       <div className="invoice-content">
         <div className="invoice-content-items">
-          {["All", "Pending", "Paid", "Cancelled", "Draft"].map((filter) => (
+          {[
+            "All",
+            ...["Pending", "Paid"].map(
+              (status) =>
+                status === "Paid"
+                  ? "Paid" // If isFullyPaid = true, show Paid
+                  : "Pending" // If isFullyPaid = false, show Pending
+            ),
+          ].map((filter) => (
             <span
               key={filter}
               onClick={() => setActiveFilter(filter)}
@@ -290,7 +311,7 @@ const Invoice = () => {
             {table.getRowModel().rows.map((row) => (
               <tr
                 key={row.id}
-                onClick={() => handleRowClick(row.original)}
+                // onClick={() => handleRowClick(row.original)}
                 style={{ cursor: "pointer" }}
               >
                 {row.getVisibleCells().map((cell) => (

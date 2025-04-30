@@ -1,0 +1,68 @@
+@import url("https://fonts.googleapis.com/css2?family=Sen:wght@400..800&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+  box-sizing: border-box;
+  font-family: "Sen", sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.app {
+  background: #f1f1f1;
+}
+.app button,
+.app input {
+  font-family: "Sen", sans-serif;
+}
+.app .primary-btn {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #2671fe;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(38, 113, 254, 0.3);
+  transition: all 0.2s ease-in-out;
+}
+.app .primary-btn:hover {
+  background-color: #1a5fe0;
+  box-shadow: 0 4px 8px rgba(38, 113, 254, 0.3);
+}
+.app .primary-btn:active {
+  background-color: #0d4fc7;
+  transform: translateY(1px);
+}
+.app .delete-btn {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #e11900;
+  color: #ffffff;
+  display: inline-flex;
+  border: none;
+  border-radius: 5px;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(207, 11, 11, 0.3);
+  transition: all 0.2s ease-in-out;
+}
+.app .delete-btn:hover {
+  background-color: #e20a0a;
+  box-shadow: 0 4px 8px rgba(255, 5, 5, 0.842);
+}
+.app .delete-btn:active {
+  background-color: #ff0404;
+  transform: translateY(1px);
+}/*# sourceMappingURL=global.css.map */

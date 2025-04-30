@@ -37,12 +37,12 @@ const NewAdd = ({ setOpenAdd }) => {
               </label>
               <input type="text" name="" id="" placeholder="address line 1" />
             </div>
-            <div className="form-group">
+            {/* <div className="form-group">
               <label htmlFor="">
                 <span>*</span>Address Line 2
               </label>
               <input type="text" name="" id="" placeholder="address line 2" />
-            </div>
+            </div> */}
             <div className="form-group">
               <label htmlFor="">
                 <span>*</span>Pincode

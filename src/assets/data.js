@@ -53,6 +53,11 @@ export const sidebarItems = [
     title: "Discount ",
     link: "discount",
   },
+  {
+    icon: BadgePercent,
+    title: "PDF",
+    link: "download-pdf",
+  },
 ];
 
 //////////////// table Data
