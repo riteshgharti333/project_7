@@ -5,11 +5,11 @@ import logo from "../../assets/images/logo.png";
 import { PDFViewer } from "@react-pdf/renderer";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { ToWords } from "to-words";
 
-import { baseUrl } from "../../main";
+import { baseUrl } from "../../main"; 
 
 import { useRef } from "react";
 import html2canvas from "html2canvas";
