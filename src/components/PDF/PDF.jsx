@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { ToWords } from "to-words";
 
-import { baseUrl } from "../../main"; 
+import { baseUrl } from "../../main";
 
 import { useRef } from "react";
 import html2canvas from "html2canvas";
@@ -240,8 +240,10 @@ const PDF = () => {
             <p>Total Items / Qty : 1 / 1</p>
           </div> */}
             <div className="pdf-qty-item disc">
-              <p>Discount </p>
-              <p>-₹ {totalDiscount}</p>
+              <p>Extra Discount </p>
+              <p>
+                -{extraDiscountType} {extraDiscount}
+              </p>
             </div>
             <div className="pdf-qty-item total disc">
               <p>Total </p>

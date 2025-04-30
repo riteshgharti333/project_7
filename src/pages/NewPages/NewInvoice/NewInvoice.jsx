@@ -371,7 +371,7 @@ const NewInvoice = () => {
 
   // Submit invoice to backend
   const submitInvoice = async (status = "sent") => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       if (!customerData) {
         toast.error("Please select a customer");
@@ -430,7 +430,6 @@ const NewInvoice = () => {
         invoiceData.signature = sigData._id;
       }
 
-
       const { data } = await axios.post(
         `${baseUrl}/invoice/new-invoice`,
         invoiceData
@@ -440,14 +439,13 @@ const NewInvoice = () => {
 
       if (data && data.invoice) {
         toast.success(data.message);
+        navigate(`/invoice`);
       }
-
-      // navigate(`/invoice/${response.data.data._id}`);
     } catch (error) {
       console.error("Error creating invoice:", error);
       toast.error(error.response?.data?.message || "Failed to create invoice");
-    }finally{
-    setIsLoading(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
