@@ -27,6 +27,7 @@
     "react-scripts": "^5.0.1",
     "react-select": "^5.10.1",
     "react-to-pdf": "^2.0.0",
+    "recharts": "^2.15.3",
     "sass": "^1.85.1",
     "sonner": "^2.0.3",
     "to-words": "^4.5.0"

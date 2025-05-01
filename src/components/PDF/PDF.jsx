@@ -4,7 +4,7 @@ import cross_img from "../../assets/images/cross.png";
 import logo from "../../assets/images/logo.png";
 import { PDFViewer } from "@react-pdf/renderer";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { ToWords } from "to-words";
@@ -16,7 +16,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 const PDF = () => {
-  const { id } = useParams();
+  const { name, id } = useParams();
 
   const [data, setData] = useState({});
 
@@ -50,10 +50,13 @@ const PDF = () => {
   useEffect(() => {
     const getAllInvoice = async () => {
       try {
-        const { data } = await axios.get(`${baseUrl}/invoice/${id}`);
-        if (data && data?.invoice) {
-          console.log(data);
-          setData(data?.invoice);
+        const { data } = await axios.get(`${baseUrl}/${name}/${id}`);
+        if (data) {
+          if (name === "invoice" && data.invoice) {
+            setData(data.invoice);
+          } else if (name === "quotation" && data.quotation) {
+            setData(data.quotation);
+          }
         }
       } catch (error) {
         console.error("Error fetching invoices:", error);
@@ -61,6 +64,8 @@ const PDF = () => {
     };
     getAllInvoice();
   }, []);
+
+  console.log(data);
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
@@ -133,7 +138,7 @@ const PDF = () => {
         <div className="pdf-container">
           <div className="pdf-container-top">
             <p></p>
-            <p>Invoice</p>
+            <p>{name === "quotation" ? "Quotation" : "Invoice"}</p>
             <p>Original for recipient</p>
           </div>
 
@@ -189,11 +194,16 @@ const PDF = () => {
             <div className="pdf-container-company-right">
               <div className="pdf-container-company-right-top">
                 <div className="pdf-container-company-right-top-left">
-                  <span>Invoice #:</span>
+                  <span>
+                    {name === "quotation" ? "Quotation" : "Invoice"} #:
+                  </span>
                   <span>{shortId}</span>
                 </div>
                 <div className="pdf-container-company-right-top-right">
-                  <span>Invoice Date:</span>
+                  <span>
+                    {" "}
+                    {name === "quotation" ? "Quotation" : "Invoice"} Date:
+                  </span>
                   <span>{formattedInvoiceDate}</span>
                 </div>
               </div>
@@ -224,10 +234,11 @@ const PDF = () => {
                     <td>{item.name}</td>
                     <td>{}</td>
                     <td>₹{item.unitPrice}</td>
+
                     <td>{item.quantity}</td>
                     <td>
-                      ₹{item.totalAmount} ({item.discount}
-                      {item.discountType})
+                      ₹{item.totalAmount} (Discount: {item.discountType}
+                      {item.discount})
                     </td>
                   </tr>
                 ))}

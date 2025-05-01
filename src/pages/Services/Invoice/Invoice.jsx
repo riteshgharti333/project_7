@@ -1,5 +1,4 @@
 import "./Invoice.scss";
-
 import { Plus, Search } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
 import Select from "react-select";
@@ -10,14 +9,12 @@ import {
   getSortedRowModel,
   getPaginationRowModel,
   flexRender,
+  getFilteredRowModel,
 } from "@tanstack/react-table";
 import { useEffect, useMemo, useState } from "react";
 import CardInvoice from "../../../components/CardInvoice/CardInvoice";
-
 import axios from "axios";
 import { baseUrl } from "../../../main";
-import PDF from "../../../components/PDF/PDF";
-import { PDFViewer } from "@react-pdf/renderer";
 
 const weekOptions = [
   { value: "today", label: "Today" },
@@ -25,7 +22,7 @@ const weekOptions = [
   { value: "last_week", label: "Last Week" },
   { value: "this_month", label: "This Month" },
   { value: "last_month", label: "Last Month" },
-  { value: "last_year", label: "Last Year" }, // Added Last Year option
+  { value: "last_year", label: "Last Year" },
 ];
 
 const customStyles = {
@@ -57,24 +54,17 @@ const customStyles = {
 const Invoice = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
-
   const [openInvoiceCard, setOpenInvoiceCard] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
-
-  const [selectedRange, setSelectedRange] = useState(weekOptions[5]); // Default set to "Last Year"
-
-  const [openPdf, setOpenPdf] = useState(false);
-
-  /////////////////////////
-
-  const [invoiceData, setInvoiceData] = useState();
+  const [selectedRange, setSelectedRange] = useState(weekOptions[5]);
+  const [invoiceData, setInvoiceData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const getAllInvoice = async () => {
       try {
         const { data } = await axios.get(`${baseUrl}/invoice/all-invoices`);
         if (data && data.invoices) {
-          console.log(data);
           setInvoiceData(data.invoices);
         }
       } catch (error) {
@@ -84,47 +74,98 @@ const Invoice = () => {
     getAllInvoice();
   }, []);
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
   const handleWeekChange = (option) => {
     setSelectedRange(option);
-    console.log("Filter by:", option.value);
   };
 
   const filteredData = useMemo(() => {
-    if (!invoiceData) return [];
-    if (activeFilter === "All") return invoiceData;
-    return invoiceData.filter((item) => {
-      const payment = item.payments?.[0];
-      const paymentStatus = payment
-        ? payment.isFullyPaid
-          ? "Paid"
-          : "Pending"
-        : "Pending";
-      return paymentStatus === activeFilter;
-    });
-  }, [activeFilter, invoiceData]);
+    let result = invoiceData;
+    
+    // Apply status filter
+    if (activeFilter !== "All") {
+      result = result.filter((item) => {
+        const payment = item.payments?.[0];
+        const paymentStatus = payment
+          ? payment.isFullyPaid
+            ? "Paid"
+            : "Pending"
+          : "Pending";
+        return paymentStatus === activeFilter;
+      });
+    }
+    
+    // Apply search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter((invoice) => {
+        return (
+          invoice.customer?.name?.toLowerCase().includes(query) ||
+          invoice._id.toLowerCase().includes(query) ||
+          invoice.payments?.[0]?.mode?.toLowerCase().includes(query) ||
+          invoice.totalAmount.toString().includes(query)
+        );
+      });
+    }
+    
+    // Apply date range filter
+    if (selectedRange) {
+      const now = new Date();
+      let startDate = new Date();
+      
+      switch (selectedRange.value) {
+        case "today":
+          startDate.setHours(0, 0, 0, 0);
+          break;
+        case "this_week":
+          startDate.setDate(now.getDate() - now.getDay());
+          break;
+        case "last_week":
+          startDate.setDate(now.getDate() - now.getDay() - 7);
+          break;
+        case "this_month":
+          startDate.setDate(1);
+          break;
+        case "last_month":
+          startDate.setMonth(now.getMonth() - 1);
+          startDate.setDate(1);
+          break;
+        case "last_year":
+          startDate.setFullYear(now.getFullYear() - 1);
+          startDate.setMonth(0);
+          startDate.setDate(1);
+          break;
+        default:
+          return result;
+      }
+      
+      result = result.filter((invoice) => {
+        const invoiceDate = new Date(invoice.invoiceDate);
+        return invoiceDate >= startDate;
+      });
+    }
+    
+    return result;
+  }, [activeFilter, invoiceData, searchQuery, selectedRange]);
 
   const columns = useMemo(
     () => [
       {
         accessorKey: "totalAmount",
         header: "Amount",
-        cell: (info) => {
-          const products = info.row.original.products;
-          const total = products.reduce(
-            (acc, curr) => acc + curr.totalAmount,
-            0
-          );
-          return `₹${total}`;
-        },
+        cell: (info) => `₹${info.getValue()}`,
       },
       {
         accessorKey: "_id",
         header: "Bill No",
-        cell: (info) => info.getValue().slice(-6).toUpperCase(), // last 6 chars of ID
+        cell: (info) => info.getValue().slice(-6).toUpperCase(),
       },
       {
         accessorKey: "customer.name",
-        header: "Name",
+        header: "Customer Name",
         cell: (info) => info.row.original.customer?.name || "N/A",
       },
       {
@@ -132,32 +173,16 @@ const Invoice = () => {
         cell: (info) => info.row.original.payments?.[0]?.mode || "N/A",
       },
       {
-        accessorKey: "status", // Assuming you're using "status" in your row data
         header: "Status",
         cell: (info) => {
-          const value = info.getValue(); // Get the status value
-
-          // If status is not defined, determine it based on payment data
-          const payment = info.row.original.payments?.[0]; // Get the first payment
+          const payment = info.row.original.payments?.[0];
           const paymentStatus = payment
             ? payment.isFullyPaid
               ? "Paid"
               : "Pending"
-            : "Pending"; // Default to "Pending" if no payments are available
-
-          // Set color based on the payment status
-          const color =
-            paymentStatus === "Paid"
-              ? "green"
-              : paymentStatus === "Pending"
-              ? "#f39c12"
-              : paymentStatus === "Cancelled"
-              ? "red"
-              : "gray";
-
-          return (
-            <span style={{ color, fontWeight: 600 }}>{paymentStatus}</span>
-          );
+            : "Pending";
+          const color = paymentStatus === "Paid" ? "green" : "#f39c12";
+          return <span style={{ color, fontWeight: 600 }}>{paymentStatus}</span>;
         },
       },
       {
@@ -174,28 +199,26 @@ const Invoice = () => {
       },
       {
         header: "View",
-        cell: (info) => {
-          return (
-            <div className="view-section">
-              <span
-                onClick={() => {
-                  setOpenInvoiceCard(true);
-                  setSelectedInvoice(info.row.original);
-                }}
-                className="view-link"
-              >
-                Invoice
-              </span>
-              <br />
-              <Link
-                to={`/invoice/${info.row.original._id}`}
-                className="view-link"
-              >
-                View
-              </Link>
-            </div>
-          );
-        },
+        cell: (info) => (
+          <div className="view-section">
+            <span
+              onClick={() => {
+                setOpenInvoiceCard(true);
+                setSelectedInvoice(info.row.original);
+              }}
+              className="view-link"
+            >
+              Invoice
+            </span>
+            <br />
+            <Link
+              to={`/invoice/${info.row.original._id}`}
+              className="view-link"
+            >
+              View
+            </Link>
+          </div>
+        ),
       },
     ],
     []
@@ -207,6 +230,7 @@ const Invoice = () => {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     initialState: {
       pagination: {
         pageSize: 7,
@@ -214,22 +238,15 @@ const Invoice = () => {
     },
   });
 
-  const handleRowClick = (invoice) => {
-    console.log("Row clicked:", invoice);
-
-    setSelectedInvoice(invoice);
-    setOpenInvoiceCard(true);
-  };
-
   return (
     <div className="invoice">
-
       {openInvoiceCard && (
         <CardInvoice
           setOpenInvoiceCard={setOpenInvoiceCard}
           onClose={() => setOpenInvoiceCard(false)}
           title="Invoice"
           dateName="Invoice"
+          invoiceSmData={selectedInvoice}
         />
       )}
 
@@ -242,15 +259,7 @@ const Invoice = () => {
 
       <div className="invoice-content">
         <div className="invoice-content-items">
-          {[
-            "All",
-            ...["Pending", "Paid"].map(
-              (status) =>
-                status === "Paid"
-                  ? "Paid" // If isFullyPaid = true, show Paid
-                  : "Pending" // If isFullyPaid = false, show Pending
-            ),
-          ].map((filter) => (
+          {["All", "Pending", "Paid"].map((filter) => (
             <span
               key={filter}
               onClick={() => setActiveFilter(filter)}
@@ -264,7 +273,12 @@ const Invoice = () => {
         <div className="invoice-content-inputs">
           <div className="invoice-content-inputs-search">
             <Search className="search-icon" />
-            <input type="search" placeholder="search by customer..." />
+            <input
+              type="search"
+              placeholder="Search by customer, bill no, amount..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
           </div>
           <div className="invoice-content-inputs-week">
             <Select
@@ -309,11 +323,7 @@ const Invoice = () => {
           </thead>
           <tbody>
             {table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                // onClick={() => handleRowClick(row.original)}
-                style={{ cursor: "pointer" }}
-              >
+              <tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

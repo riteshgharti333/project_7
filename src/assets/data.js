@@ -21,11 +21,11 @@ export const sidebarItems = [
     link: "invoice",
   },
 
-  {
-    icon: Receipt,
-    title: "Billing",
-    link: "billing",
-  },
+  // {
+  //   icon: Receipt,
+  //   title: "Billing",
+  //   link: "billing",
+  // },
 
   {
     icon: MonitorCog,
@@ -39,25 +39,27 @@ export const sidebarItems = [
   },
 
   {
-    icon: ClipboardList,
-    title: "Report",
-    link: "report",
-  },
-  {
     icon: ShoppingCart,
     title: "Product",
     link: "product",
   },
+
   {
-    icon: BadgePercent,
-    title: "Discount ",
-    link: "discount",
+    icon: ClipboardList,
+    title: "Report",
+    link: "report",
   },
-  {
-    icon: BadgePercent,
-    title: "PDF",
-    link: "download-pdf",
-  },
+
+  // {
+  //   icon: BadgePercent,
+  //   title: "Discount ",
+  //   link: "discount",
+  // },
+  // {
+  //   icon: BadgePercent,
+  //   title: "PDF",
+  //   link: "download-pdf",
+  // },
 ];
 
 //////////////// table Data
@@ -69,10 +71,6 @@ export const tableData = [
     item_unit_price: "2000",
   },
 ];
-
-
-
-
 
 export const reportData = [
   {

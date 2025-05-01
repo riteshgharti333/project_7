@@ -1,5 +1,4 @@
 import "./Quotation.scss";
-
 import { Plus, Search } from "lucide-react";
 import { IoIosArrowDown } from "react-icons/io";
 import Select from "react-select";
@@ -10,9 +9,12 @@ import {
   getSortedRowModel,
   getPaginationRowModel,
   flexRender,
+  getFilteredRowModel,
 } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CardInvoice from "../../../components/CardInvoice/CardInvoice";
+import axios from "axios";
+import { baseUrl } from "../../../main";
 
 const weekOptions = [
   { value: "today", label: "Today" },
@@ -20,6 +22,7 @@ const weekOptions = [
   { value: "last_week", label: "Last Week" },
   { value: "this_month", label: "This Month" },
   { value: "last_month", label: "Last Month" },
+  { value: "last_year", label: "Last Year" },
 ];
 
 const customStyles = {
@@ -48,133 +51,144 @@ const customStyles = {
   }),
 };
 
-const data = [
-  {
-    _id: "1",
-    name: "Amit Sharma",
-    email: "amit@example.com",
-    phoneNumber: "9876543210",
-    createdAt: "2024-04-22T10:00:00Z",
-    amount: "₹4,200",
-    mode: "UPI",
-    status: "Paid",
-    billNo: "INV-1001",
-  },
-  {
-    _id: "2",
-    name: "Sara Khan",
-    email: "sara.khan@example.com",
-    phoneNumber: "9812345678",
-    createdAt: "2024-04-20T12:30:00Z",
-    amount: "₹2,500",
-    mode: "Cash",
-    status: "Pending",
-    billNo: "INV-1002",
-  },
-  {
-    _id: "3",
-    name: "Rohit Verma",
-    email: "rohit.verma@example.com",
-    phoneNumber: "9123456780",
-    createdAt: "2024-04-19T14:15:00Z",
-    amount: "₹1,850",
-    mode: "Card",
-    status: "Cancelled",
-    billNo: "INV-1003",
-  },
-  {
-    _id: "4",
-    name: "Nikita Joshi",
-    email: "nikita.j@example.com",
-    phoneNumber: "9012345678",
-    createdAt: "2024-04-18T08:45:00Z",
-    amount: "₹3,600",
-    mode: "UPI",
-    status: "Paid",
-    billNo: "INV-1004",
-  },
-  {
-    _id: "5",
-    name: "Manoj Mehta",
-    email: "manoj.m@example.com",
-    phoneNumber: "9998887777",
-    createdAt: "2024-04-16T11:20:00Z",
-    amount: "₹5,000",
-    mode: "Bank Transfer",
-    status: "Draft",
-    billNo: "INV-1005",
-  },
-];
-
 const Quotation = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
-
   const [openInvoiceCard, setOpenInvoiceCard] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [selectedRange, setSelectedRange] = useState(weekOptions[5]);
+  const [invoiceData, setInvoiceData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const [selectedRange, setSelectedRange] = useState(weekOptions[1]); // default to "This Week"
+  useEffect(() => {
+    const getAllInvoice = async () => {
+      try {
+        const { data } = await axios.get(`${baseUrl}/quotation/all-quotations`);
+        if (data && data.quotation) {
+          setInvoiceData(data.quotation);
+        }
+      } catch (error) {
+        console.error("Error fetching quotation:", error);
+      }
+    };
+    getAllInvoice();
+  }, []);
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
 
   const handleWeekChange = (option) => {
     setSelectedRange(option);
-    // Optional: apply filtering logic here
-    console.log("Filter by:", option.value);
   };
 
   const filteredData = useMemo(() => {
-    if (activeFilter === "All") return data;
-    return data.filter((item) => item.status === activeFilter);
-  }, [activeFilter]);
+    let result = invoiceData;
+
+    // Apply status filter
+    if (activeFilter !== "All") {
+      result = result.filter((item) => {
+        const payment = item.payments?.[0];
+        const paymentStatus = payment
+          ? payment.isFullyPaid
+            ? "Paid"
+            : "Pending"
+          : "Pending";
+        return paymentStatus === activeFilter;
+      });
+    }
+
+    // Apply search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter((invoice) => {
+        return (
+          invoice.customer?.name?.toLowerCase().includes(query) ||
+          invoice._id.toLowerCase().includes(query) ||
+          invoice.payments?.[0]?.mode?.toLowerCase().includes(query) ||
+          invoice.totalAmount.toString().includes(query)
+        );
+      });
+    }
+
+    // Apply date range filter
+    if (selectedRange) {
+      const now = new Date();
+      let startDate = new Date();
+
+      switch (selectedRange.value) {
+        case "today":
+          startDate.setHours(0, 0, 0, 0);
+          break;
+        case "this_week":
+          startDate.setDate(now.getDate() - now.getDay());
+          break;
+        case "last_week":
+          startDate.setDate(now.getDate() - now.getDay() - 7);
+          break;
+        case "this_month":
+          startDate.setDate(1);
+          break;
+        case "last_month":
+          startDate.setMonth(now.getMonth() - 1);
+          startDate.setDate(1);
+          break;
+        case "last_year":
+          startDate.setFullYear(now.getFullYear() - 1);
+          startDate.setMonth(0);
+          startDate.setDate(1);
+          break;
+        default:
+          return result;
+      }
+
+      result = result.filter((invoice) => {
+        const invoiceDate = new Date(invoice.quotationDate);
+        return invoiceDate >= startDate;
+      });
+    }
+
+    return result;
+  }, [activeFilter, invoiceData, searchQuery, selectedRange]);
 
   const columns = useMemo(
     () => [
       {
-        accessorKey: "amount",
+        accessorKey: "totalAmount",
         header: "Amount",
-        cell: (info) => info.getValue(),
+        cell: (info) => `₹${info.getValue()}`,
       },
       {
-        accessorKey: "billNo",
+        accessorKey: "_id",
         header: "Bill No",
-        cell: (info) => info.getValue(),
+        cell: (info) => info.getValue().slice(-6).toUpperCase(),
       },
       {
-        accessorKey: "name",
-        header: "Name",
-        cell: (info) => info.getValue(),
+        accessorKey: "customer.name",
+        header: "Customer Name",
+        cell: (info) => info.row.original.customer?.name || "N/A",
       },
       {
-        accessorKey: "mode",
         header: "Payment Mode",
-        cell: (info) => info.getValue(),
+        cell: (info) => info.row.original.payments?.[0]?.mode || "N/A",
       },
       {
-        accessorKey: "status",
         header: "Status",
         cell: (info) => {
-          const value = info.getValue();
-          const color =
-            value === "Paid"
-              ? "green"
-              : value === "Pending"
-              ? "#f39c12"
-              : value === "Cancelled"
-              ? "red"
-              : "gray";
+          const payment = info.row.original.payments?.[0];
+          const paymentStatus = payment
+            ? payment.isFullyPaid
+              ? "Paid"
+              : "Pending"
+            : "Pending";
+          const color = paymentStatus === "Paid" ? "green" : "#f39c12";
           return (
-            <span
-              style={{
-                color,
-                fontWeight: 600,
-              }}
-            >
-              {value}
-            </span>
+            <span style={{ color, fontWeight: 600 }}>{paymentStatus}</span>
           );
         },
       },
       {
-        accessorKey: "createdAt",
+        accessorKey: "quotationDate",
         header: "Date",
         cell: (info) => {
           const date = new Date(info.getValue());
@@ -184,6 +198,29 @@ const Quotation = () => {
             year: "numeric",
           });
         },
+      },
+      {
+        header: "View",
+        cell: (info) => (
+          <div className="view-section">
+            <span
+              onClick={() => {
+                setOpenInvoiceCard(true);
+                setSelectedInvoice(info.row.original);
+              }}
+              className="view-link"
+            >
+              Quotation
+            </span>
+            <br />
+            <Link
+              to={`/quotation/${info.row.original._id}`}
+              className="view-link"
+            >
+              View
+            </Link>
+          </div>
+        ),
       },
     ],
     []
@@ -195,19 +232,13 @@ const Quotation = () => {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     initialState: {
       pagination: {
         pageSize: 7,
       },
     },
   });
-
-  const handleRowClick = (invoice) => {
-    console.log("Row clicked:", invoice);
-
-    setSelectedInvoice(invoice);
-    setOpenInvoiceCard(true);
-  };
 
   return (
     <div className="invoice">
@@ -217,11 +248,12 @@ const Quotation = () => {
           onClose={() => setOpenInvoiceCard(false)}
           title="Quotation"
           dateName="Quotation"
+          invoiceSmData={selectedInvoice}
         />
       )}
 
       <div className="invoice-top">
-        <h1>Quotations</h1>
+        <h1>Quotation</h1>
         <Link className="primary-btn" to={"/new-quotation"}>
           <Plus size={20} /> Create Quotation
         </Link>
@@ -229,7 +261,7 @@ const Quotation = () => {
 
       <div className="invoice-content">
         <div className="invoice-content-items">
-          {["All", "Open", "Closed"].map((filter) => (
+          {["All", "Pending", "Paid"].map((filter) => (
             <span
               key={filter}
               onClick={() => setActiveFilter(filter)}
@@ -243,7 +275,12 @@ const Quotation = () => {
         <div className="invoice-content-inputs">
           <div className="invoice-content-inputs-search">
             <Search className="search-icon" />
-            <input type="search" placeholder="search by customer..." />
+            <input
+              type="search"
+              placeholder="Search by customer, bill no, amount..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
           </div>
           <div className="invoice-content-inputs-week">
             <Select
@@ -288,11 +325,7 @@ const Quotation = () => {
           </thead>
           <tbody>
             {table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                onClick={() => handleRowClick(row.original)}
-                style={{ cursor: "pointer" }}
-              >
+              <tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

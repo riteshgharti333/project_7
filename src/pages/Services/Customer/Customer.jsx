@@ -11,9 +11,12 @@ import {
   getPaginationRowModel,
   flexRender,
 } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import NewCustomer from "../../../components/NewCustomer/NewCustomer";
 import CardCustomer from "../../../components/CardCustomer/CardCustomer";
+import { baseUrl } from "../../../main";
+
+import axios from "axios";
 
 const weekOptions = [
   { value: "today", label: "Today" },
@@ -49,54 +52,83 @@ const customStyles = {
   }),
 };
 
-const data = [
-  {
-    _id: "1",
-    name: "Amit Sharma",
-    phoneNumber: "9876543210",
-    balance: "₹4,200",
-    createdAt: "2024-04-20T12:30:00Z",
-  },
-  {
-    _id: "1",
-    name: "Amit Sharma",
-    phoneNumber: "9876543210",
-    balance: "₹4,200",
-    createdAt: "2024-04-20T12:30:00Z",
-  },
-  {
-    _id: "1",
-    name: "Amit Sharma",
-    phoneNumber: "9876543210",
-    balance: "₹4,200",
-    createdAt: "2024-04-20T12:30:00Z",
-  },
-  {
-    _id: "1",
-    name: "Amit Sharma",
-    phoneNumber: "9876543210",
-    balance: "₹4,200",
-    createdAt: "2024-04-20T12:30:00Z",
-  },
-  {
-    _id: "1",
-    name: "Amit Sharma",
-    phoneNumber: "9876543210",
-    balance: "₹4,200",
-    createdAt: "2024-04-20T12:30:00Z",
-  },
-];
-
 const Customer = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
 
-    const [openCustomerCard , setOpenCustomerCard] = useState(false);
+  const [openCustomerCard, setOpenCustomerCard] = useState(false);
 
-    const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
 
-  const [selectedRange, setSelectedRange] = useState(weekOptions[1]); // default to "This Week"
+  const [selectedRange, setSelectedRange] = useState(weekOptions[1]);
 
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/customer/all-customers`);
+        const customerList = response.data.customers;
+
+        // Fetch all invoices for each customer
+        const customerWithBalance = await Promise.all(
+          customerList.map(async (customer) => {
+            let closingBalance = 0;
+
+            if (customer.invoiceId?.length) {
+              const invoiceResponses = await Promise.all(
+                customer.invoiceId.map((id) =>
+                  axios.get(`${baseUrl}/invoice/${id}`)
+                )
+              );
+
+              closingBalance = invoiceResponses.reduce(
+                (acc, res) => acc + (res.data.invoice?.amountBalance || 0),
+                0
+              );
+            }
+
+            return {
+              ...customer,
+              closingBalance,
+            };
+          })
+        );
+
+        setCustomers(customerWithBalance);
+      } catch (error) {
+        console.error("Failed to fetch customers", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomers();
+  }, []);
+
+  useEffect(() => {
+    const getAllInvoices = async () => {
+      try {
+        const invoicePromises = customers.invoiceId.map((id) =>
+          axios.get(`${baseUrl}/invoice/${id}`)
+        );
+
+        const responses = await Promise.all(invoicePromises);
+        const invoices = responses.map((res) => res.data.invoice);
+
+        setInvoiceIdData(invoices);
+      } catch (error) {
+        console.error("Error fetching invoices:", error);
+      }
+    };
+
+    if (customers?.invoiceId?.length) {
+      getAllInvoices();
+    }
+  }, [customers]);
+
+  
   const handleWeekChange = (option) => {
     setSelectedRange(option);
     // Optional: apply filtering logic here
@@ -104,9 +136,9 @@ const Customer = () => {
   };
 
   const filteredData = useMemo(() => {
-    if (activeFilter === "All") return data;
-    return data.filter((item) => item.status === activeFilter);
-  }, [activeFilter]);
+    if (activeFilter === "All") return customers;
+    return customers.filter((item) => item.status === activeFilter);
+  }, [activeFilter, customers]);
 
   const columns = useMemo(
     () => [
@@ -116,17 +148,16 @@ const Customer = () => {
         cell: (info) => info.getValue(),
       },
       {
-        accessorKey: "phoneNumber",
+        accessorKey: "phone",
         header: "Phone Number",
         cell: (info) => info.getValue(),
       },
 
       {
-        accessorKey: "balance",
+        accessorKey: "closingBalance",
         header: "Closing Balance",
-        cell: (info) => info.getValue(),
+        cell: (info) => `₹${info.getValue()?.toFixed(2) || 0}`,
       },
-
       {
         accessorKey: "createdAt",
         header: "Date",
@@ -159,7 +190,6 @@ const Customer = () => {
   const handleRowClick = (customer) => {
     setOpenCustomerCard(true);
     setSelectedInvoice(customer);
-
   };
 
   const [openCustomer, setOpenCustomer] = useState(false);
@@ -168,7 +198,12 @@ const Customer = () => {
     <div className="customer">
       {openCustomer && <NewCustomer setOpenCustomer={setOpenCustomer} />}
 
-      {openCustomerCard && <CardCustomer setOpenCustomerCard={setOpenCustomerCard} />}
+      {openCustomerCard && (
+        <CardCustomer
+          setOpenCustomerCard={setOpenCustomerCard}
+          customer={selectedInvoice}
+        />
+      )}
       <div className="customer-top">
         <h1>Customers</h1>
         <button className="primary-btn" onClick={() => setOpenCustomer(true)}>

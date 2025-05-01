@@ -1,181 +1,193 @@
-@use "../../../styles/responsive.scss" as *;
+.report {
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+  background-color: #f9f9f9;
+  min-height: 100vh;
 
-.invoice {
-  .invoice-top {
+  .report-top {
     display: flex;
     justify-content: space-between;
-    .primary-btn {
-      gap: 5px;
-    }
-  }
+    align-items: center;
+    margin-bottom: 2rem;
 
-  .invoice-pdf {
-  }
-
-  .invoice-content {
-    margin-top: 20px;
-    .invoice-content-items {
-      display: flex;
-      gap: 30px;
-      span {
-        font-weight: bold;
-        color: $secondary-color;
-        transition: all 0.3s ease-in-out;
-        cursor: pointer;
-        border-bottom: 2px solid transparent;
-        border-radius: 1px;
-        padding-bottom: 3px;
-
-        &.active-filter {
-          color: $primary-color;
-          border-bottom: 2px solid $primary-color;
-        }
-
-        &:hover {
-          color: $primary-color;
-        }
-      }
-    }
-
-    .invoice-content-inputs {
+    &-left {
       display: flex;
       align-items: center;
-      margin-top: 20px;
-      gap: 30px;
-      .invoice-content-inputs-search {
+      text-decoration: none;
+      color: #333;
+      gap: 0.5rem;
+
+      h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .report-actions {
+      .print-btn {
         display: flex;
         align-items: center;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        .search-icon {
-          color: $primary-color;
-          width: 20px;
-          margin-left: 10px;
-        }
+        gap: 0.5rem;
+        background-color: #4f46e5;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
 
-        input {
-          border: none;
-          background: transparent;
-          padding: 10px;
-          font-size: 16px;
-          outline: none;
-          width: 100%;
-          height: 100%;
-        }
-      }
-
-      .invoice-content-inputs-week {
-        button {
-          background: #e8e8ed;
-          color: #000;
-          display: flex;
-          gap: 5px;
+        &:hover {
+          background-color: #4338ca;
         }
       }
     }
   }
-}
 
-.view-section {
-  display: flex;
-  gap: 10px;
+  .report-filters {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
 
-  .view-link {
-    color: #fff;
-    font-size: 14px;
-    padding: 5px;
-    border-radius: 5px;
-    font-weight: 100;
-    &:first-child {
-      background: #008000;
-    }
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      min-width: 150px;
 
-    &:last-child {
-      background: $primary-color;
-    }
-  }
-}
+      label {
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+        color: #555;
+      }
 
-//////////////////////////
-
-.table {
-  width: 100%;
-  background: white;
-  border-radius: 5px;
-  overflow-x: auto;
-  margin-top: 30px;
-  height: 80vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-
-    th {
-      color: $secondary-color;
-      padding: 12px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    td {
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
-      font-weight: bold;
-    }
-
-    tr:hover {
-      background: rgba(0, 70, 253, 0.1);
+      input, select {
+        padding: 0.4rem 0.6rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        background-color: #fff;
+      }
     }
   }
-}
 
-.pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-  align-items: center;
+  .report-section {
+    margin-bottom: 2rem;
 
-  .page {
-    margin: 0px 20px;
-  }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
 
-  button {
-    background: #0046fd;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    margin: 0 5px;
-    border-radius: 5px;
-    cursor: pointer;
+      h3 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+      }
 
-    &:disabled {
-      background: #aaa;
-      cursor: not-allowed;
+      .btn {
+        display: flex;
+        align-items: center;
+        background-color: #10b981;
+        border: none;
+        padding: 0.5rem 1rem;
+        color: white;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: #059669;
+        }
+      }
+    }
+
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+
+      .stat-card {
+        background: white;
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+
+        h4 {
+          font-size: 1rem;
+          color: #666;
+          margin-bottom: 0.4rem;
+        }
+
+        p {
+          font-size: 1.2rem;
+          font-weight: bold;
+          color: #111;
+        }
+      }
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: 10px;
+      background: white;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 600px;
+
+        th, td {
+          padding: 0.75rem 1rem;
+          text-align: left;
+          font-size: 0.95rem;
+        }
+
+        thead {
+          background-color: #f3f4f6;
+          border-bottom: 2px solid #e5e7eb;
+
+          th {
+            font-weight: 600;
+            color: #333;
+          }
+        }
+
+        tbody {
+          tr {
+            border-bottom: 1px solid #eee;
+
+            &:hover {
+              background-color: #f9fafb;
+            }
+
+            td {
+              color: #444;
+            }
+          }
+        }
+      }
     }
   }
-}
 
-.status {
-  padding: 4px 8px;
-  border-radius: 5px;
-  font-weight: bold;
-
-  &.active {
-    background: #d4edda;
-    color: #155724;
-  }
-
-  &.inactive {
-    background: #f8d7da;
-    color: #721c24;
-  }
-
-  &.pending {
-    background: #fff3cd;
-    color: #856404;
+  .loading {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #555;
+    padding: 3rem 0;
   }
 }

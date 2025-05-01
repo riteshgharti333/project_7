@@ -47,42 +47,10 @@
       }
 
       .cardCustomer-content {
-        .cardCustomer-content-left {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          margin-top: 20px;
-          .cardCustomer-content-left-item {
-            .invoice-name {
-              background: #b5fdff;
-              padding: 15px;
-              font-size: 18x;
-              font-weight: bold;
-              border-radius: 50%;
-              letter-spacing: 1px;
-            }
-          }
-
-          .cardCustomer-content-left-item2 {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            .cardCustomer-content-left-item2-item {
-              display: flex;
-              gap: 30px;
-
-              p {
-                font-weight: 500;
-                display: flex;
-                gap: 10px;
-                color: $secondary-color;
-                span {
-                  font-weight: bold;
-                  color: #000;
-                }
-              }
-            }
-          }
+        p{
+          margin-top: 10px;
+          font-size: 20px;
+          font-weight: bold;
         }
       }
     }
@@ -91,8 +59,14 @@
       margin-top: 30px;
 
       h3 {
-        font-size: 30px;
+        font-size: 25px;
         margin-bottom: 20px;
+
+        span{
+          &:first-child{
+            font-size: 18px;
+          }
+        }
       }
 
       .cardCustomer-product-table {

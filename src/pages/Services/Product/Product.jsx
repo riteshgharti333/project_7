@@ -11,11 +11,13 @@ import {
   getPaginationRowModel,
   flexRender,
 } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import NewCustomer from "../../../components/NewCustomer/NewCustomer";
 import CardCustomer from "../../../components/CardCustomer/CardCustomer";
 import NewProduct from "../../../components/NewProduct/NewProduct";
 import CardProduct from "../../../components/CardProduct/CardProduct";
+import { baseUrl } from "../../../main";
+import axios from "axios";
 
 const weekOptions = [
   { value: "today", label: "Today" },
@@ -51,46 +53,31 @@ const customStyles = {
   }),
 };
 
-const data = [
-  {
-    _id: "101",
-    itemName: "Notebook",
-    quantity: 3,
-    sellingPrice: 120,
-    total: 3 * 120, // ₹360
-  },
-  {
-    _id: "102",
-    itemName: "Ball Pen",
-    quantity: 10,
-    sellingPrice: 15,
-    total: 10 * 15, // ₹150
-  },
-  {
-    _id: "103",
-    itemName: "Water Bottle",
-    quantity: 2,
-    sellingPrice: 250,
-    total: 2 * 250, // ₹500
-  },
-  {
-    _id: "104",
-    itemName: "Backpack",
-    quantity: 1,
-    sellingPrice: 1500,
-    total: 1 * 1500, // ₹1500
-  },
-];
-
 const Product = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
 
   const [openProduct, setOpenProduct] = useState(false);
 
-  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [productData, setProductdata] = useState(null);
 
-  const [selectedRange, setSelectedRange] = useState(weekOptions[1]); // default to "This Week"
+  const [selectedRange, setSelectedRange] = useState(weekOptions[1]);
+
+  const [prouducts, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data } = await axios.get(`${baseUrl}/product/all-products`);
+        setProducts(data?.products);
+        console.log(data);
+      } catch (error) {
+        console.error("Failed to fetch customers", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const handleWeekChange = (option) => {
     setSelectedRange(option);
@@ -99,24 +86,24 @@ const Product = () => {
   };
 
   const filteredData = useMemo(() => {
-    if (activeFilter === "All") return data;
-    return data.filter((item) => item.status === activeFilter);
+    if (activeFilter === "All") return prouducts;
+    return prouducts.filter((item) => item.status === activeFilter);
   }, [activeFilter]);
 
   const columns = useMemo(
     () => [
       {
-        accessorKey: "itemName",
+        accessorKey: "name",
         header: "Item",
         cell: (info) => info.getValue(),
       },
       {
-        accessorKey: "quantity",
+        accessorKey: "unit",
         header: "Quantity",
         cell: (info) => info.getValue(),
       },
       {
-        accessorKey: "sellingPrice",
+        accessorKey: "price",
         header: "Selling Price",
         cell: (info) => `₹${info.getValue()}`,
       },
@@ -125,7 +112,7 @@ const Product = () => {
   );
 
   const table = useReactTable({
-    data: filteredData,
+    data: prouducts,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -137,9 +124,9 @@ const Product = () => {
     },
   });
 
-  const handleRowClick = (customer) => {
+  const handleRowClick = (product) => {
+    setProductdata(product)
     setOpenCardProduct(true);
-    setSelectedInvoice(customer);
   };
 
   const [openCardProduct, setOpenCardProduct] = useState(false);
@@ -149,7 +136,7 @@ const Product = () => {
       {openProduct && <NewProduct setOpenProduct={setOpenProduct} />}
 
       {openCardProduct && (
-        <CardProduct setOpenCardProduct={setOpenCardProduct} />
+        <CardProduct product={productData}  setOpenCardProduct={setOpenCardProduct}/>
       )}
       <div className="product-top">
         <h1>Product</h1>

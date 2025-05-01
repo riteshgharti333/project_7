@@ -36,7 +36,7 @@ function App() {
           <Route path="/new-invoice" element={<NewInvoice />} />
           <Route path="/new-quotation" element={<NewQuotation />} />
           <Route path="/report" element={<Report />} />
-          <Route path="/invoice/:id" element={<PDF />} />
+          <Route path="/:name/:id" element={<PDF />} />
           <Route path="/sm-pdf" element={<SmPDF />} />
         </Routes>
       </BrowserRouter>

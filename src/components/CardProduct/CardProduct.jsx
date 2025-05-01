@@ -3,7 +3,8 @@ import "./CardProduct.scss";
 import { RxCross2 } from "react-icons/rx";
 import { ArrowRight, CirclePlus } from "lucide-react";
 
-const CardProduct = ({ setOpenCardProduct }) => {
+const CardProduct = ({ setOpenCardProduct,product }) => {
+  
   const handleClose = () => {
     setOpenCardProduct(false);
   };
@@ -17,7 +18,7 @@ const CardProduct = ({ setOpenCardProduct }) => {
               className="cross-icon"
               onClick={handleClose} // Cross icon click
             />
-            <h2>Product Name</h2>
+            <h2>{product.name}</h2>
           </div>
 
           {/* <button className="primary-btn" onClick={handleClose}>
@@ -28,34 +29,21 @@ const CardProduct = ({ setOpenCardProduct }) => {
         <div className="cardProduct-desc">
           <p className="details">Details</p>
 
-          <div className="cardProduct-content">
-            <div className="cardProduct-content-left">
-              <div className="cardProduct-content-left-item2">
-                <div className="cardProduct-content-left-item2-item">
-                  <p>
-                    Date <span>24-04-2025</span>
-                  </p>
-                  <p>
-                    Due Date <span>24-04-2025</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+       
         </div>
 
         <div className="cardProduct-price">
           <div className="cardProduct-price-item">
             <p>Price</p>
-            <span>₹100</span>
+            <span>₹{product.price}</span>
           </div>
           <div className="cardProduct-price-item">
             <p>Sale Amount</p>
-            <span>₹100</span>
+            <span>₹{product.price}</span>
           </div>
           <div className="cardProduct-price-item">
             <p>Total Discount</p>
-            <span>₹100</span>
+            <span>0</span>
           </div>
         </div>
       </div>

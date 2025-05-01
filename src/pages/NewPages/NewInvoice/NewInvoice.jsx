@@ -81,9 +81,11 @@ const NewInvoice = () => {
   const [product, setProduct] = useState([]);
   const { productId } = useParams();
 
+  const [deleteIndex, setDeleteIndex] = useState(null);
+
   const handleDeleteProduct = (index) => {
     setProductData((prevData) => prevData.filter((_, i) => i !== index));
-    setOpenDelete(false);
+    setDeleteIndex(null); // Reset after deletion
   };
 
   const handleProductData = (data) => {
@@ -352,6 +354,15 @@ const NewInvoice = () => {
     isFullyPaid: false,
   });
 
+  useEffect(() => {
+    if (invoiceForm.isFullyPaid) {
+      setInvoiceForm((prev) => ({
+        ...prev,
+        paymentAmount: calculateTotalAmount().toFixed(2),
+      }));
+    }
+  }, [invoiceForm.isFullyPaid, calculateTotalAmount]);
+
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -391,8 +402,8 @@ const NewInvoice = () => {
         products: productData.map((item) => ({
           productId: item._id,
           name: item.name,
-          quantity: Number(item.price || 0),
-          unitPrice: Number(item.unit || 0),
+          quantity: Number(item.unit || 0),
+          unitPrice: Number(item.price || 0),
           discount: Number(item.discount || 0),
           discountType: item.discountType === "₹" ? "₹" : "%",
           totalAmount: calculateNetAmount(item),
@@ -408,10 +419,9 @@ const NewInvoice = () => {
           calculateTotalAmount().toFixed(2) -
           Number(invoiceForm.paymentAmount || 0),
         status,
-        discount: {
-          amount: Number(invoiceForm.extraDiscount || 0),
-          type: invoiceForm.extraDiscountType === "₹" ? "₹" : "%",
-        },
+        extraDiscount: extraDiscount || 0,
+        extraDiscountType: extraDiscountType,
+
         payments: [
           {
             notes: invoiceForm.paymentNotes,
@@ -434,8 +444,6 @@ const NewInvoice = () => {
         `${baseUrl}/invoice/new-invoice`,
         invoiceData
       );
-
-      console.log(data);
 
       if (data && data.invoice) {
         toast.success(data.message);
@@ -666,28 +674,15 @@ const NewInvoice = () => {
                         {item.name}
                         <Trash
                           className="trash-icon"
-                          onClick={() => setOpenDelete(!openDelete)}
+                          onClick={() => setDeleteIndex(index)}
                         />
 
-                        {openDelete && (
+                        {deleteIndex === index && (
                           <DeleteCard
                             onDelete={() => handleDeleteProduct(index)}
-                            onClose={() => setOpenDelete(false)}
+                            onClose={() => setDeleteIndex(null)}
                           />
                         )}
-                      </td>
-                      <td>
-                        <input
-                          className="product-item"
-                          type="number"
-                          placeholder="Qty"
-                          value={item.price}
-                          onChange={(e) => {
-                            const newData = [...productData];
-                            newData[index].price = Number(e.target.value);
-                            setProductData(newData);
-                          }}
-                        />
                       </td>
                       <td>
                         <input
@@ -696,8 +691,23 @@ const NewInvoice = () => {
                           placeholder="Unit Price"
                           value={item.unit}
                           onChange={(e) => {
+                            const value = Math.max(0, Number(e.target.value));
                             const newData = [...productData];
-                            newData[index].unit = Number(e.target.value);
+                            newData[index].unit = value;
+                            setProductData(newData);
+                          }}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          className="product-item"
+                          type="number"
+                          placeholder="Qty"
+                          value={item.price}
+                          onChange={(e) => {
+                            const value = Math.max(0, Number(e.target.value));
+                            const newData = [...productData];
+                            newData[index].price = value;
                             setProductData(newData);
                           }}
                         />
@@ -709,8 +719,9 @@ const NewInvoice = () => {
                           placeholder="Discount"
                           value={item.discount}
                           onChange={(e) => {
+                            const value = Math.max(0, Number(e.target.value));
                             const newData = [...productData];
-                            newData[index].discount = e.target.value;
+                            newData[index].discount = value;
                             setProductData(newData);
                           }}
                         />
@@ -795,7 +806,7 @@ const NewInvoice = () => {
                   <span>Extra Discount</span>
                   <div className="total-amount-top-desc">
                     <select
-                      name=""
+                      name="extraDiscountType"
                       id=""
                       value={extraDiscountType}
                       onChange={handleDiscountTypeChange}
@@ -806,6 +817,7 @@ const NewInvoice = () => {
                     <input
                       type="text"
                       placeholder="extra discount..."
+                      name="extraDiscount"
                       onChange={handleExtraDiscountChange}
                     />
                   </div>
@@ -906,7 +918,12 @@ const NewInvoice = () => {
                 <span>Add payment (Payment Notes, Amount and Mode)</span>
 
                 <div className="fully-paid">
-                  <input type="checkbox" name="" id="" />
+                  <input
+                    type="checkbox"
+                    name="isFullyPaid"
+                    checked={invoiceForm.isFullyPaid}
+                    onChange={handleInputChange}
+                  />
                   <span>Mark as fully paid</span>
                 </div>
               </div>

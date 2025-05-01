@@ -2,12 +2,54 @@ import "./CardInvoice.scss";
 
 import { RxCross2 } from "react-icons/rx";
 import { ArrowRight, CirclePlus } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const CardInvoice = ({ setOpenInvoiceCard, title }) => {
+const CardInvoice = ({ invoiceSmData, setOpenInvoiceCard, title }) => {
   const handleClose = () => {
     setOpenInvoiceCard(false);
   };
 
+
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      return "Invalid date";
+    }
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }).format(date);
+  };
+
+  const {
+    _id,
+    dueDate,
+    invoiceDate,
+    amountBalance,
+    totalAmount,
+    totalDiscount,
+    reference,
+    extraDiscount,
+    extraDiscountType,
+    notes,
+    terms,
+    customer,
+    bank,
+    signature,
+    payments,
+    products,
+  } = invoiceSmData;
+
+  const shortId = _id?.slice(-6);
+
+  const formattedDueDate = formatDate(dueDate);
+
+  const formattedInvoiceDate = formatDate(
+    title === "Quotation" ? invoiceSmData.quotationDate : invoiceDate
+  );
+
+  console.log(invoiceSmData)
   return (
     <div className="cardInvoice">
       <div className="cardInvoice-container">
@@ -20,9 +62,12 @@ const CardInvoice = ({ setOpenInvoiceCard, title }) => {
             <h2>{title}</h2>
           </div>
 
-          {/* <button className="primary-btn" onClick={handleClose}>
-            Save & Update <ArrowRight size={20} />
-          </button> */}
+          <Link
+            className="primary-btn"
+            to={`/${title === "Quotation" ? "quotation" : "invoice"}/${_id}`}
+          >
+            View PDF
+          </Link>
         </div>
 
         <div className="cardInvoice-desc">
@@ -31,17 +76,19 @@ const CardInvoice = ({ setOpenInvoiceCard, title }) => {
           <div className="cardInvoice-content">
             <div className="cardInvoice-content-left">
               <div className="cardInvoice-content-left-item">
-                <span className="invoice-name">KP</span>
+                <span className="invoice-name">
+                  {customer?.name?.charAt(0)}
+                </span>
               </div>
 
               <div className="cardInvoice-content-left-item2">
-                <p>Apple</p>
+                <p>{customer?.name}</p>
                 <div className="cardInvoice-content-left-item2-item">
                   <p>
-                    {title} Date <span>24-04-2025</span>
+                    {title} Date <span>{formattedInvoiceDate}</span>
                   </p>
                   <p>
-                    Due Date <span>24-04-2025</span>
+                    Due Date <span>{formattedDueDate}</span>
                   </p>
                 </div>
               </div>
@@ -50,21 +97,21 @@ const CardInvoice = ({ setOpenInvoiceCard, title }) => {
         </div>
 
         <div className="cardInvoice-price">
-          <h3>₹100.00</h3>
+          <h3>₹{totalAmount}</h3>
 
           <div className="cardInvoice-price-customer">
             <table className="cardInvoice-table">
               <tr>
                 <td>Customer</td>
-                <td>Ritesh</td>
+                <td>{customer?.name}</td>
               </tr>
               <tr>
                 <td>Phone Number</td>
-                <td>123456789</td>
+                <td>{customer?.phone}</td>
               </tr>
               <tr>
                 <td>Email</td>
-                <td>a@gmail.com</td>
+                <td>{customer?.email}</td>
               </tr>
             </table>
           </div>
@@ -79,39 +126,86 @@ const CardInvoice = ({ setOpenInvoiceCard, title }) => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Product A</td>
-                <td>2</td>
-                <td>₹500</td>
-                <td>₹1000</td>
-              </tr>
-              <tr>
-                <td>Product B</td>
-                <td>1</td>
-                <td>₹1200</td>
-                <td>₹1200</td>
-              </tr>
-              <tr>
-                <td>Product C</td>
-                <td>3</td>
-                <td>₹300</td>
-                <td>₹900</td>
-              </tr>
+              {products.map((item, index) => (
+                <tr>
+                  <td>{item.name}</td>
+                  <td>{item.quantity}</td>
+                  <td>₹{item.unitPrice}</td>
+                  <td>
+                  ₹{item.totalAmount} (Discount: {item.discountType}
+                    {item.discount})
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
 
           <div className="cardInvoice-total-amount">
             <div className="cardInvoice-total-amount-item">
-              <p>Taxable Amount:</p>
-              <span>₹100.00</span>
+              <p>Extra Discount:</p>
+              <span>{extraDiscountType} {extraDiscount}</span>
             </div>
             <div className="cardInvoice-total-amount-item">
               <p>Total Amount:</p>
-              <span>₹100.00</span>
-            </div>{" "}
+              <span>₹{totalAmount}</span>
+            </div>
             <div className="cardInvoice-total-amount-item">
-              <p>Amount:</p>
-              <span>₹100.00</span>
+              <p>Total Discount:</p>
+              <span>₹{totalDiscount}</span>
+            </div>
+            <hr />
+            <div className="cardInvoice-total-amount-item">
+              <p>Amount Paid:</p>
+              <span>₹{payments[0].amount}</span>
+            </div>
+            <div className="cardInvoice-total-amount-item">
+              <p>Amount Pending:</p>
+              <span>₹{amountBalance}</span>
+            </div>
+          </div>
+
+          <div className="cardInvoice-payments">
+            <p>Payments</p>
+            <span>{payments[0].mode}</span>
+          </div>
+
+          <div className="cardInvoice-bank-details">
+            <p>Bank Details:</p>
+
+            <div className="cardInvoice-bank-details-items">
+              <p>
+                <span>Bank Holder Name:</span>{" "}
+                <span>{bank?.accountHolderName}</span>
+              </p>
+              <p>
+                <span>Account Number:</span> <span>{bank?.accountNumber}</span>
+              </p>
+              <p>
+                <span>IFSC Code:</span> <span>{bank?.ifscCode}</span>
+              </p>
+              <p>
+                <span>Bank Name:</span> <span>{bank?.bankName}</span>
+              </p>
+              <p>
+                <span>Branch Name:</span> <span>{bank?.branchName}</span>
+              </p>
+              <p>
+                <span>UPI ID:</span> <span>{bank?.upiId}</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="cardInvoice-signature-details">
+            <p>Signature:</p>
+
+            <div className="cardInvoice-signature-details-items">
+              <p>
+                <span>Signaure Name:</span>{" "}
+                <span>{signature?.signatureName}</span>
+              </p>
+              <p>
+                <img src={signature?.signatureImage} alt="" />
+              </p>
             </div>
           </div>
         </div>
