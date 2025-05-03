@@ -74,6 +74,21 @@ const CardCustomer = ({ setOpenCustomerCard, customer }) => {
             <span>Total Amount:</span> <span>₹{totalClosingBalance}</span>
           </h3>
 
+          {invoiceIdData.map((item, index) => (
+            <div className="cardCustomer-sm">
+              <div className="cardCustomer-sm-left">
+                <p>#{item._id.slice(-6)}</p>
+                <p>{new Date(item.invoiceDate).toLocaleDateString()}</p>
+                <p>{item.payments?.[0]?.isFullyPaid ? "Paid" : "Pending"}</p>
+              </div>
+              <div className="cardCustomer-sm-right">
+                <p>Amount</p>
+                <p>₹{item.totalAmount.toFixed(2)}</p>
+                <p>Closing Blance: ₹{item.amountBalance}</p>
+              </div>
+            </div>
+          ))}
+
           <table className="cardCustomer-product-table">
             <thead>
               <tr>
@@ -82,7 +97,7 @@ const CardCustomer = ({ setOpenCustomerCard, customer }) => {
                 <th>Status</th>
                 <th>Amount</th>
                 <th>Closing Balance</th>
-                <th>Actions</th>
+                {/* <th>Actions</th> */}
               </tr>
             </thead>
             <tbody>
@@ -91,19 +106,19 @@ const CardCustomer = ({ setOpenCustomerCard, customer }) => {
                   <td>#{item._id.slice(-6)}</td>
                   <td>{new Date(item.invoiceDate).toLocaleDateString()}</td>
                   <td>
-                    {item.payments?.[0]?.isFullyPaid ? "Completed" : "Pending"}
+                    {item.payments?.[0]?.isFullyPaid ? "Paid" : "Pending"}
                   </td>{" "}
                   {/* Payment Status */}
                   <td>₹{item.totalAmount.toFixed(2)}</td> {/* Total Amount */}
                   <td>₹{item.amountBalance}</td>
                   {/* Closing Balance */}
-                  <td>
+                  {/* <td>
                     <button
                       onClick={() => console.log("Invoice ID:", item._id)}
                     >
                       Delete
                     </button>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

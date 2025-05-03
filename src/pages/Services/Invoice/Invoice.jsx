@@ -15,6 +15,10 @@ import { useEffect, useMemo, useState } from "react";
 import CardInvoice from "../../../components/CardInvoice/CardInvoice";
 import axios from "axios";
 import { baseUrl } from "../../../main";
+import { BsThreeDots } from "react-icons/bs";
+import { toast } from "sonner";
+import { FaRegTrashAlt, FaTelegramPlane, FaWhatsapp } from "react-icons/fa";
+import { IoMailUnreadOutline } from "react-icons/io5";
 
 const weekOptions = [
   { value: "today", label: "Today" },
@@ -74,6 +78,16 @@ const Invoice = () => {
     getAllInvoice();
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".actions-dropdown")) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -82,9 +96,12 @@ const Invoice = () => {
     setSelectedRange(option);
   };
 
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+
   const filteredData = useMemo(() => {
     let result = invoiceData;
-    
+
     // Apply status filter
     if (activeFilter !== "All") {
       result = result.filter((item) => {
@@ -97,7 +114,7 @@ const Invoice = () => {
         return paymentStatus === activeFilter;
       });
     }
-    
+
     // Apply search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -110,12 +127,12 @@ const Invoice = () => {
         );
       });
     }
-    
+
     // Apply date range filter
     if (selectedRange) {
       const now = new Date();
       let startDate = new Date();
-      
+
       switch (selectedRange.value) {
         case "today":
           startDate.setHours(0, 0, 0, 0);
@@ -141,16 +158,34 @@ const Invoice = () => {
         default:
           return result;
       }
-      
+
       result = result.filter((invoice) => {
         const invoiceDate = new Date(invoice.invoiceDate);
         return invoiceDate >= startDate;
       });
     }
-    
+
     return result;
   }, [activeFilter, invoiceData, searchQuery, selectedRange]);
 
+  const handleDeleteInvoice = async (invoiceId) => {
+    try {
+      const response = await axios.delete(`${baseUrl}/invoice/${invoiceId}`);
+      if (response.data) {
+        setInvoiceData((prevData) =>
+          prevData.filter((invoice) => invoice._id !== invoiceId)
+        );
+        toast.success(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error deleting invoice:", error);
+      toast.error(error.response.data.message);
+    } finally {
+      setOpenMenuId(null); // Close the dropdown
+    }
+  };
+
+  const [openSendId, setOpenSendId] = useState(null);
   const columns = useMemo(
     () => [
       {
@@ -182,7 +217,9 @@ const Invoice = () => {
               : "Pending"
             : "Pending";
           const color = paymentStatus === "Paid" ? "green" : "#f39c12";
-          return <span style={{ color, fontWeight: 600 }}>{paymentStatus}</span>;
+          return (
+            <span style={{ color, fontWeight: 600 }}>{paymentStatus}</span>
+          );
         },
       },
       {
@@ -210,19 +247,105 @@ const Invoice = () => {
             >
               Invoice
             </span>
-            <br />
+
             <Link
               to={`/invoice/${info.row.original._id}`}
               className="view-link"
             >
               View
             </Link>
+
+            {/* <span className="view-link send-btn">
+              <p
+                onClick={(e) => {
+                  console.log(first);
+                  e.stopPropagation();
+                  setOpenSendId((prev) =>
+                    prev === info.row.original._id
+                      ? null
+                      : info.row.original._id
+                  );
+                }}
+                className="send-btn"
+              >
+                <FaTelegramPlane className="plan-icon" />
+                Send
+              </p>
+
+                <div className="send-dropdown">
+                  <p
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    <IoMailUnreadOutline className="mail-icon" /> Email
+                  </p>
+                  <p
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    <FaWhatsapp className="mail-icon" /> Whatsapp
+                  </p>
+                </div>
+            
+            </span> */}
           </div>
         ),
+      },
+      {
+        header: "Actions",
+        cell: (info) => {
+          const invoiceId = info.row.original._id;
+
+          return (
+            <div className="actions-dropdown">
+              <button
+                className="three-dots-button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setMenuPosition({
+                    top: rect.bottom + window.scrollY - 50,
+                    left: rect.left + window.scrollX - 120,
+                  });
+                  setOpenMenuId(invoiceId);
+                }}
+              >
+                <BsThreeDots />
+              </button>
+            </div>
+          );
+        },
       },
     ],
     []
   );
+
+  const DropdownMenu = () => {
+    if (!openMenuId) return null;
+
+    return (
+      <div
+        className="dropdown-menu-portal"
+        style={{
+          position: "absolute",
+          top: `${menuPosition.top}px`,
+          left: `${menuPosition.left}px`,
+        }}
+      >
+        <button
+          onClick={() => {
+            handleDeleteInvoice(openMenuId);
+            setOpenMenuId(null);
+          }}
+          className="row-delete-btn"
+        >
+          Delete
+        </button>
+      </div>
+    );
+  };
 
   const table = useReactTable({
     data: filteredData,
@@ -238,8 +361,37 @@ const Invoice = () => {
     },
   });
 
+  let totalInvoiceAmount = 0;
+  let totalPaidAmount = 0;
+  let totalPendingAmount = 0;
+
+  invoiceData.forEach((invoice) => {
+    totalInvoiceAmount += invoice.totalAmount || 0;
+    totalPendingAmount += invoice.amountBalance || 0;
+
+    if (Array.isArray(invoice.payments)) {
+      invoice.payments.forEach((payment) => {
+        totalPaidAmount += payment.amount || 0;
+      });
+    }
+  });
+
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      return "Invalid date";
+    }
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }).format(date);
+  };
+
   return (
     <div className="invoice">
+      <DropdownMenu />
+
       {openInvoiceCard && (
         <CardInvoice
           setOpenInvoiceCard={setOpenInvoiceCard}
@@ -271,33 +423,102 @@ const Invoice = () => {
         </div>
 
         <div className="invoice-content-inputs">
-          <div className="invoice-content-inputs-search">
-            <Search className="search-icon" />
-            <input
-              type="search"
-              placeholder="Search by customer, bill no, amount..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
+          <div className="invoice-content-left">
+            <div className="invoice-content-inputs-search">
+              <Search className="search-icon" />
+              <input
+                type="search"
+                placeholder="Search by customer, bill no, amount..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+            </div>
+            <div className="invoice-content-inputs-week">
+              <Select
+                options={weekOptions}
+                value={selectedRange}
+                onChange={handleWeekChange}
+                styles={customStyles}
+                isSearchable={false}
+                components={{
+                  DropdownIndicator: () => (
+                    <IoIosArrowDown size={18} color="#555" />
+                  ),
+                }}
+              />
+            </div>
           </div>
-          <div className="invoice-content-inputs-week">
-            <Select
-              options={weekOptions}
-              value={selectedRange}
-              onChange={handleWeekChange}
-              styles={customStyles}
-              isSearchable={false}
-              components={{
-                DropdownIndicator: () => (
-                  <IoIosArrowDown size={18} color="#555" />
-                ),
-              }}
-            />
+
+          <div className="invoice-content-right">
+            <p>
+              <span>Total </span> <span>₹{totalInvoiceAmount.toFixed(2)}</span>
+            </p>
+            <p>
+              <span>Paid </span> <span>₹{totalPaidAmount.toFixed(2)}</span>
+            </p>
+            <p>
+              <span>Pending </span>{" "}
+              <span>₹{totalPendingAmount.toFixed(2)}</span>
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="table">
+      <div className="invoice-sm">
+        <div className="invoice-sm-items">
+          {filteredData?.map((item, index) => (
+            <div className="invoice-sm-item" key={index}>
+              <div className="invoice-sm-item-left">
+                <div className="invoice-sm-item-top">
+                  <p>{item?.customer?.name}</p>
+                </div>
+                <div className="invoice-sm-item-bill">
+                  <span>
+                    {item._id?.slice(-6)}{" "}
+                    <span className="mode">{item?.payments[0].mode}</span>
+                  </span>
+                </div>
+
+                <div className="invoice-sm-status">
+                  <p>
+                    <span>Status: </span>
+                    {item?.payments[0].isFullyPaid ? (
+                      <span className="pay-done">Paid</span>
+                    ) : (
+                      <span className="pay-pending">Pending</span>
+                    )}
+                  </p>
+                </div>
+                <div className="invoice-sm-view">
+                  <span
+                    onClick={() => {
+                      setOpenInvoiceCard(true);
+                      setSelectedInvoice(item);
+                    }}
+                    className="sm-view"
+                  >
+                    Invoice
+                  </span>
+                  <Link className="sm-view" to={`/invoice/${item?._id}`}>
+                    View
+                  </Link>
+                </div>
+              </div>
+              <div className="invoice-sm-item-right">
+                <h3>₹{item?.totalAmount}</h3>
+
+                <p>{formatDate(item.invoiceDate)}</p>
+
+                <span onClick={() => handleDeleteInvoice(item._id)}>
+                  <FaRegTrashAlt className="bin-icon" /> Delete
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="invoice-table">
         <table>
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (

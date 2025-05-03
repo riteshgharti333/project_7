@@ -4,8 +4,17 @@
   .invoice-top {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     .primary-btn {
       gap: 5px;
+      font-size: 16px;
+      padding: 10px;
+    }
+
+    h1 {
+      @include sm {
+        font-size: 22px;
+      }
     }
   }
 
@@ -42,34 +51,84 @@
       align-items: center;
       margin-top: 20px;
       gap: 30px;
-      .invoice-content-inputs-search {
+      justify-content: space-between;
+
+      @include lg {
+        flex-direction: column;
+        align-items: normal;
+        gap: 20px;
+      }
+      .invoice-content-left {
         display: flex;
         align-items: center;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        .search-icon {
-          color: $primary-color;
-          width: 20px;
-          margin-left: 10px;
+        gap: 30px;
+        flex-wrap: wrap;
+
+        @include sm {
+          gap: 10px;
+        }
+        .invoice-content-inputs-search {
+          display: flex;
+          align-items: center;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+
+          .search-icon {
+            color: $primary-color;
+            width: 20px;
+            margin-left: 10px;
+          }
+
+          input {
+            border: none;
+            background: transparent;
+            padding: 10px;
+            font-size: 16px;
+            outline: none;
+            width: 100%;
+            height: 100%;
+          }
         }
 
-        input {
-          border: none;
-          background: transparent;
-          padding: 10px;
-          font-size: 16px;
-          outline: none;
-          width: 100%;
-          height: 100%;
+        .invoice-content-inputs-week {
+          button {
+            background: #e8e8ed;
+            color: #000;
+            display: flex;
+            gap: 5px;
+          }
         }
       }
+      .invoice-content-right {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
 
-      .invoice-content-inputs-week {
-        button {
-          background: #e8e8ed;
-          color: #000;
+        @include sm {
+          gap: 10px;
+        }
+
+        p {
+          background: #f3f9ff;
+          padding: 10px 5px;
+          border-radius: 5px;
           display: flex;
-          gap: 5px;
+          gap: 10px;
+          &:last-child {
+            background: #fdf0e6;
+          }
+
+          span {
+            &:first-child {
+              font-weight: bold;
+              color: $secondary-color;
+            }
+
+            &:last-child {
+              font-size: 18px;
+              font-weight: bold;
+            }
+          }
         }
       }
     }
@@ -78,7 +137,7 @@
 
 .view-section {
   display: flex;
-  gap: 10px;
+  gap: 5px;
 
   .view-link {
     color: #fff;
@@ -94,12 +153,13 @@
     &:last-child {
       background: $primary-color;
     }
+
   }
 }
 
 //////////////////////////
 
-.table {
+.invoice-table {
   width: 100%;
   background: white;
   border-radius: 5px;
@@ -109,6 +169,12 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
+  margin-bottom: 30px;
+
+  @include md {
+    display: none;
+  }
 
   table {
     width: 100%;
@@ -139,6 +205,7 @@
   justify-content: center;
   margin-top: 10px;
   align-items: center;
+  margin-bottom: 10px;
 
   .page {
     margin: 0px 20px;
@@ -178,5 +245,188 @@
   &.pending {
     background: #fff3cd;
     color: #856404;
+  }
+}
+
+/* Invoice.scss */
+.actions-dropdown {
+  position: relative;
+  display: flex;
+  justify-content: center;
+
+  .three-dots-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      border-radius: 50%;
+    }
+  }
+}
+
+.dropdown-menu-portal {
+  position: absolute;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  .row-delete-btn {
+    border: none;
+    padding: 10px 5px;
+    transition: all 0.3s ease-in-out;
+    color: red;
+    background: #fff;
+    width: 100%;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    &:hover {
+      background: red;
+      color: #fff;
+    }
+  }
+
+  .row-send-btn {
+    border: none;
+    padding: 10px 5px;
+    transition: all 0.3s ease-in-out;
+    color: red;
+    background: #fff;
+    width: 100%;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    position: relative;
+    &:hover {
+      background: red;
+      color: #fff;
+    }
+  }
+}
+
+.invoice-sm {
+  margin-top: 30px;
+
+  @media (min-width: "769px") {
+    display: none;
+  }
+  .invoice-sm-items {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    .invoice-sm-item {
+      background: #fff;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+      border-radius: 5px;
+      .invoice-sm-item-left {
+        .invoice-sm-item-top {
+          p {
+            font-weight: bold;
+            font-size: 18px;
+            color: $primary-color;
+          }
+        }
+
+        .invoice-sm-item-bill {
+          span {
+            font-weight: bold;
+            .mode {
+              font-size: 10px;
+              background: $primary-color;
+              padding: 2px;
+              border-radius: 3px;
+              color: #fff;
+            }
+          }
+        }
+
+        .invoice-sm-status {
+          margin-top: 5px;
+          p {
+            span {
+              &:first-child {
+                font-size: 14px;
+                color: $secondary-color;
+                font-weight: bold;
+              }
+            }
+
+            .pay-done {
+              font-size: 16px;
+              color: #008000;
+              font-weight: bold;
+            }
+            .pay-pending {
+              font-size: 16px;
+              color: #f39c12;
+              font-weight: bold;
+            }
+          }
+        }
+
+        .invoice-sm-view {
+          display: flex;
+          gap: 5px;
+          .sm-view {
+            color: #fff;
+            padding: 5px;
+            font-size: 12px;
+            margin-top: 10px;
+            border-radius: 2px;
+            font-weight: 500;
+
+            &:first-child {
+              background: $primary-color;
+            }
+            &:last-child {
+              background: #008000;
+            }
+          }
+        }
+      }
+
+      .invoice-sm-item-right {
+        h3 {
+          font-size: 22px;
+        }
+        p {
+          color: $secondary-color;
+          font-weight: bold;
+          font-size: 14px;
+          margin-top: 5px;
+        }
+
+        span {
+          background: #ff0000;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          padding: 5px;
+          border-radius: 5px;
+          margin-top: 10px;
+          gap: 5px;
+          .bin-icon {
+            font-size: 12px;
+          }
+        }
+      }
+    }
   }
 }

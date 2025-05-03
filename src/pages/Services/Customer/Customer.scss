@@ -9,38 +9,37 @@
     }
   }
 
-  .customer-content{
+  .customer-content {
     margin-top: 20px;
-    .customer-content-items{
+    .customer-content-items {
       display: flex;
       gap: 30px;
-      span{
+      span {
         font-weight: bold;
         color: $secondary-color;
-        transition: all .3s ease-in-out;
+        transition: all 0.3s ease-in-out;
         cursor: pointer;
         border-bottom: 2px solid transparent;
         border-radius: 1px;
         padding-bottom: 3px;
 
-        &.active-filter{
+        &.active-filter {
           color: $primary-color;
           border-bottom: 2px solid $primary-color;
         }
 
-        &:hover{
+        &:hover {
           color: $primary-color;
         }
       }
-
     }
 
-    .customer-content-inputs{
+    .customer-content-inputs {
       display: flex;
       align-items: center;
       margin-top: 20px;
       gap: 30px;
-      .customer-content-inputs-search{
+      .customer-content-inputs-search {
         display: flex;
         align-items: center;
         border: 1px solid #ddd;
@@ -60,27 +59,69 @@
           width: 100%;
           height: 100%;
         }
-
-        
       }
 
-      .customer-content-inputs-week{
-        button{
-       background: #E8E8ED;
-       color: #000;
-       display: flex;
-       gap: 5px;
+      .customer-content-inputs-week {
+        button {
+          background: #e8e8ed;
+          color: #000;
+          display: flex;
+          gap: 5px;
         }
       }
     }
   }
-
 }
 
+.customer-sm{
+  margin-top: 30px;
+  
+  @media (min-width: "769px") {
+    display: none;
+  }
 
-//////////////////////////  
+  .customer-sm-items{
+    display: flex;
 
-.table {
+    flex-direction: column;
+    gap: 20px;
+    .customer-sm-item{
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      background: #fff;
+      box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+      border-radius: 5px;
+      .customer-sm-item-left{
+           p{
+            color: $primary-color;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 18px;
+           }
+           span{
+            font-weight: bold;
+            color: $secondary-color;
+           }
+      }
+      .customer-sm-item-right{
+        p{
+          font-weight: bold;
+          margin: 5px 0px;
+          font-size: 25px;
+         }
+        span{
+          font-weight: bold;
+          color: $secondary-color;
+         }
+      }
+    }
+  }
+}
+
+//////////////////////////
+
+.customer-table {
   width: 100%;
   background: white;
   border-radius: 5px;
@@ -90,6 +131,10 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  @include md{
+    display: none;
+  }
 
   table {
     width: 100%;
@@ -115,48 +160,47 @@
   }
 }
 
-.table-bottom{
+.table-bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 10px 0px ;
+  margin: 10px 0px;
 
-  .table-bottom-desc{
+  .table-bottom-desc {
     display: flex;
     gap: 10px;
     margin-left: 12px;
-    .table-bottom-desc-item{
+    .table-bottom-desc-item {
       display: flex;
       gap: 10px;
       padding: 15px;
       border-radius: 5px;
 
-      span{
-        &:first-child{
+      span {
+        &:first-child {
           color: $secondary-color;
         }
-        &:last-child{
+        &:last-child {
           font-weight: bold;
           font-size: 18px;
         }
       }
 
-      &:first-child{
-        background: #FFEFED;
+      &:first-child {
+        background: #ffefed;
       }
 
-      &:last-child{
-        background: #EBF5F1;
+      &:last-child {
+        background: #ebf5f1;
       }
     }
   }
 
   .customer-pagination {
-
     .page {
       margin: 0px 20px;
     }
-  
+
     button {
       background: #0046fd;
       color: white;
@@ -165,7 +209,7 @@
       margin: 0 5px;
       border-radius: 5px;
       cursor: pointer;
-  
+
       &:disabled {
         background: #aaa;
         cursor: not-allowed;
@@ -173,7 +217,6 @@
     }
   }
 }
-
 
 .status {
   padding: 4px 8px;

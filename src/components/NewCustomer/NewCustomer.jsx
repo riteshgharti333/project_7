@@ -1,3 +1,5 @@
+import "./NewCustomer.scss";
+
 import { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import { ArrowRight, CirclePlus } from "lucide-react";
@@ -6,7 +8,7 @@ import axios from "axios";
 import { baseUrl } from "../../main";
 import { toast } from "sonner";
 import LoadingButton from "../LoadingButton/LoadingButton";
-import "./NewCustomer.scss";
+
 
 const NewCustomer = ({ setOpenCustomer, handleCustomerData }) => {
   const handleClose = () => {

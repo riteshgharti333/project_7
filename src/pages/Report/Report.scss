@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@use "../../styles/responsive.scss" as *;
 
 // Color Variables
 $primary-color: #4361ee;
@@ -12,8 +12,6 @@ $danger-color: #f72585;
 $gray-color: #6c757d;
 $light-gray: #e9ecef;
 
-// Font Variables
-$font-family: 'Inter', sans-serif;
 $font-light: 300;
 $font-regular: 400;
 $font-medium: 500;
@@ -23,7 +21,7 @@ $font-bold: 700;
 // Spacing Variables
 $spacing-xs: 0.5rem;
 $spacing-sm: 1rem;
-$spacing-md: 1.5rem;
+$spacing-md: 10px;
 $spacing-lg: 2rem;
 $spacing-xl: 3rem;
 
@@ -46,15 +44,13 @@ $transition-slow: 0.5s ease-in-out;
 
 // Base Styles
 .report {
-  font-family: $font-family;
   background-color: $light-color;
   min-height: 100vh;
   padding: $spacing-lg;
   color: $dark-color;
 
-  * {
-    box-sizing: border-box;
-  }
+
+ 
 
   // Loading State
   .loading {
@@ -132,11 +128,11 @@ $transition-slow: 0.5s ease-in-out;
         white-space: nowrap;
       }
 
-      input, select {
+      input,
+      select {
         padding: $spacing-xs $spacing-sm;
         border: 1px solid $light-gray;
         border-radius: $border-radius-sm;
-        font-family: $font-family;
         font-size: 0.9rem;
         transition: $transition-fast;
 
@@ -180,6 +176,10 @@ $transition-slow: 0.5s ease-in-out;
       background-color: rgba($primary-color, 0.05);
       border-bottom: 1px solid $light-gray;
 
+      @include md{
+        padding: 10px;
+      }
+
       h3 {
         margin: 0;
         font-size: 1.2rem;
@@ -196,7 +196,6 @@ $transition-slow: 0.5s ease-in-out;
         color: white;
         border: none;
         border-radius: $border-radius-sm;
-        font-family: $font-family;
         font-size: 0.9rem;
         font-weight: $font-medium;
         cursor: pointer;
@@ -209,7 +208,8 @@ $transition-slow: 0.5s ease-in-out;
     }
 
     // Summary Stats
-    .summary-stats, .stats-grid {
+    .summary-stats,
+    .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: $spacing-md;
@@ -322,7 +322,7 @@ $transition-slow: 0.5s ease-in-out;
 
     // Charts
     .chart-container {
-      height: 300px;
+      // height: 300px;
       padding: $spacing-lg;
     }
   }
@@ -336,7 +336,6 @@ $transition-slow: 0.5s ease-in-out;
     padding: $spacing-sm $spacing-md;
     border: none;
     border-radius: $border-radius-sm;
-    font-family: $font-family;
     font-size: 0.9rem;
     font-weight: $font-medium;
     cursor: pointer;
@@ -361,8 +360,7 @@ $transition-slow: 0.5s ease-in-out;
     }
   }
 
-  // Responsive Adjustments
-  @media (max-width: 768px) {
+  @include md {
     padding: $spacing-md;
 
     .report-filters {
@@ -376,13 +374,15 @@ $transition-slow: 0.5s ease-in-out;
       }
     }
 
-    .summary-stats, .stats-grid {
+    .summary-stats,
+    .stats-grid {
       grid-template-columns: 1fr 1fr;
     }
   }
 
-  @media (max-width: 480px) {
-    .summary-stats, .stats-grid {
+  @include sm {
+    .summary-stats,
+    .stats-grid {
       grid-template-columns: 1fr;
     }
   }

@@ -15,6 +15,10 @@ import { useEffect, useMemo, useState } from "react";
 import CardInvoice from "../../../components/CardInvoice/CardInvoice";
 import axios from "axios";
 import { baseUrl } from "../../../main";
+import { BsThreeDots } from "react-icons/bs";
+import { reportData } from "../../../assets/data";
+import { toast } from "sonner";
+import { FaRegTrashAlt } from "react-icons/fa";
 
 const weekOptions = [
   { value: "today", label: "Today" },
@@ -74,6 +78,16 @@ const Quotation = () => {
     getAllInvoice();
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".actions-dropdown")) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -81,6 +95,9 @@ const Quotation = () => {
   const handleWeekChange = (option) => {
     setSelectedRange(option);
   };
+
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
   const filteredData = useMemo(() => {
     let result = invoiceData;
@@ -150,6 +167,24 @@ const Quotation = () => {
 
     return result;
   }, [activeFilter, invoiceData, searchQuery, selectedRange]);
+
+  const handleDeleteInvoice = async (invoiceId) => {
+    try {
+      const response = await axios.delete(`${baseUrl}/quotation/${invoiceId}`);
+      if (response.data) {
+        console.log(reportData.data);
+        setInvoiceData((prevData) =>
+          prevData.filter((invoice) => invoice._id !== invoiceId)
+        );
+        toast.success(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error deleting invoice:", error);
+      toast.error(error.response.data.message);
+    } finally {
+      setOpenMenuId(null); // Close the dropdown
+    }
+  };
 
   const columns = useMemo(
     () => [
@@ -222,9 +257,71 @@ const Quotation = () => {
           </div>
         ),
       },
+      {
+        header: "Actions",
+        cell: (info) => {
+          const invoiceId = info.row.original._id;
+
+          return (
+            <div className="actions-dropdown">
+              <button
+                className="three-dots-button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setMenuPosition({
+                    top: rect.bottom + window.scrollY - 50,
+                    left: rect.left + window.scrollX - 120,
+                  });
+                  setOpenMenuId(invoiceId);
+                }}
+              >
+                <BsThreeDots />
+              </button>
+            </div>
+          );
+        },
+      },
     ],
     []
   );
+
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      return "Invalid date";
+    }
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }).format(date);
+  };
+
+  const DropdownMenu = () => {
+    if (!openMenuId) return null;
+
+    return (
+      <div
+        className="dropdown-menu-portal"
+        style={{
+          position: "absolute",
+          top: `${menuPosition.top}px`,
+          left: `${menuPosition.left}px`,
+        }}
+      >
+        <button
+          onClick={() => {
+            handleDeleteInvoice(openMenuId);
+            setOpenMenuId(null);
+          }}
+          className="row-delete-btn"
+        >
+          Delete
+        </button>
+      </div>
+    );
+  };
 
   const table = useReactTable({
     data: filteredData,
@@ -240,8 +337,15 @@ const Quotation = () => {
     },
   });
 
+  let totalInvoiceAmount = 0;
+
+  invoiceData.forEach((invoice) => {
+    totalInvoiceAmount += invoice.totalAmount || 0;
+  });
+
   return (
     <div className="invoice">
+      <DropdownMenu />
       {openInvoiceCard && (
         <CardInvoice
           setOpenInvoiceCard={setOpenInvoiceCard}
@@ -273,33 +377,94 @@ const Quotation = () => {
         </div>
 
         <div className="invoice-content-inputs">
-          <div className="invoice-content-inputs-search">
-            <Search className="search-icon" />
-            <input
-              type="search"
-              placeholder="Search by customer, bill no, amount..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
+          <div className="invoice-content-left">
+            <div className="invoice-content-inputs-search">
+              <Search className="search-icon" />
+              <input
+                type="search"
+                placeholder="Search by customer, bill no, amount..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+            </div>
+            <div className="invoice-content-inputs-week">
+              <Select
+                options={weekOptions}
+                value={selectedRange}
+                onChange={handleWeekChange}
+                styles={customStyles}
+                isSearchable={false}
+                components={{
+                  DropdownIndicator: () => (
+                    <IoIosArrowDown size={18} color="#555" />
+                  ),
+                }}
+              />
+            </div>
           </div>
-          <div className="invoice-content-inputs-week">
-            <Select
-              options={weekOptions}
-              value={selectedRange}
-              onChange={handleWeekChange}
-              styles={customStyles}
-              isSearchable={false}
-              components={{
-                DropdownIndicator: () => (
-                  <IoIosArrowDown size={18} color="#555" />
-                ),
-              }}
-            />
+          <div className="invoice-content-right">
+            <p>
+              <span>Total </span> <span>₹{totalInvoiceAmount.toFixed(2)}</span>
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="table">
+        <div className="invoice-sm">
+              <div className="invoice-sm-items">
+                {filteredData?.map((item, index) => (
+                  <div className="invoice-sm-item" key={index}>
+                    <div className="invoice-sm-item-left">
+                      <div className="invoice-sm-item-top">
+                        <p>{item?.customer?.name}</p>
+                      </div>
+                      <div className="invoice-sm-item-bill">
+                        <span>
+                          {item._id?.slice(-6)}{" "}
+                          <span className="mode">{item?.payments[0].mode}</span>
+                        </span>
+                      </div>
+      
+                      <div className="invoice-sm-status">
+                        <p>
+                          <span>Status: </span>
+                          {item?.payments[0].isFullyPaid ? (
+                            <span className="pay-done">Paid</span>
+                          ) : (
+                            <span className="pay-pending">Pending</span>
+                          )}
+                        </p>
+                      </div>
+                      <div className="invoice-sm-view">
+                        <span
+                          onClick={() => {
+                            setOpenInvoiceCard(true);
+                            setSelectedInvoice(item);
+                          }}
+                          className="sm-view"
+                        >
+                          Invoice
+                        </span>
+                        <Link className="sm-view" to={`/quotation/${item?._id}`}>
+                          View
+                        </Link>
+                      </div>
+                    </div>
+                    <div className="invoice-sm-item-right">
+                      <h3>₹{item?.totalAmount}</h3>
+      
+                      <p>{formatDate(item.quotationDate)}</p>
+      
+                      <span onClick={handleDeleteInvoice}>
+                        <FaRegTrashAlt className="bin-icon" /> Delete
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+      <div className="invoice-table">
         <table>
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (

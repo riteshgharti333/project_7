@@ -26,6 +26,12 @@
         align-items: center;
         gap: 5px;
 
+        h2{
+          @include sm{
+            font-size: 20px;
+          }
+        }
+
         .cross-icon {
           font-size: 30px;
           stroke-width: 1;
@@ -42,6 +48,7 @@
       p {
         font-weight: bold;
         color: $secondary-color;
+
       }
 
       form {
@@ -52,6 +59,10 @@
         flex-direction: column;
         gap: 10px;
         border-radius: 5px;
+
+        @include sm{
+          padding: 10px;
+        }
         .form-group {
           display: flex;
           flex-direction: column;

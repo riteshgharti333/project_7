@@ -41,8 +41,16 @@
     margin-top: 40px;
     display: flex;
     gap: 10px;
+
+    @media (max-width: "1120px") {
+      flex-direction: column;
+    }
+
     .newInvoice-customer-left {
       flex: 3;
+      @include lg {
+        max-width: 400px;
+      }
       .newInvoice-customer-left-top {
         display: flex;
         gap: 20px;
@@ -72,7 +80,7 @@
 
       .customer-detail {
         background: #e6f2ff;
-        padding: 10px;
+        padding: 12px;
         margin-top: 10px;
 
         span {
@@ -135,6 +143,34 @@
           }
         }
       }
+
+      .customer-name-sm {
+        margin-top: 10px;
+
+        @media (min-width: "1121px") {
+          display: none;
+        }
+        p {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          background: #fdf0e6;
+          border: 1px solid #ddd;
+          width: fit-content;
+          padding: 5px;
+          font-size: 16px;
+          font-weight: bold;
+          border-radius: 5px;
+
+          .cross-icon {
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            &:hover {
+              color: #ff0000;
+            }
+          }
+        }
+      }
     }
     .newInvoice-customer-right {
       flex: 7;
@@ -152,10 +188,15 @@
       .newInvoice-customer-right-items {
         display: flex;
         align-items: start;
-        margin-top: 10px;
+        margin-top: 15px !important;
         background: #f8f8f8;
         gap: 10px;
         padding: 10px;
+
+        @include md {
+          flex-wrap: wrap;
+          gap: 15px;
+        }
 
         .newInvoice-customer-right-item:nth-child(3) {
           flex: 1;
@@ -186,6 +227,10 @@
 
   .customer-name {
     margin-top: 20px;
+    @media (max-width: "1120px") {
+      display: none;
+    }
+
     p {
       display: flex;
       align-items: center;
@@ -242,9 +287,9 @@
       margin-top: 10px;
       padding: 10px;
       .newInvoice-product-content-top {
-        display: flex;
-        align-items: center;
-        gap: 20px;
+        // display: flex;
+        // align-items: center;
+        // gap: 20px;
 
         .newInvoice-product-content-top-item {
           display: flex;
@@ -269,6 +314,9 @@
             border: 1px solid #ddd;
             width: 40%;
             position: relative;
+            @include md {
+              width: 100%;
+            }
 
             input {
               border: none;
@@ -319,11 +367,75 @@
         }
       }
 
+      .newInvoice-sm-table {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        min-height: 400px;
+
+        @media (min-width: "1025px") {
+          display: none;
+        }
+        .newInvoice-sm-table-items {
+          margin-top: 10px;
+          display: flex;
+
+          gap: 30px;
+          flex-wrap: wrap;
+          background: $primary-color;
+          border-radius: 5px;
+          @include md {
+            gap: 10px;
+          }
+
+          @include sm {
+            gap: 30px;
+
+            row-gap: 0px;
+          }
+          .newInvoice-sm-table-item {
+            padding: 5px;
+            span {
+              font-weight: bold;
+            }
+            &:last-child {
+              p {
+                margin-bottom: 15px;
+              }
+            }
+
+            p {
+              margin-bottom: 10px;
+              font-size: 14px;
+              font-weight: bold;
+              color: #fff;
+            }
+
+            span {
+              // padding: 5px;
+            }
+
+            input {
+              border: 1px solid #ddd;
+              padding: 5px;
+            }
+
+            select {
+              border: 1px solid #ddd;
+              padding: 4px;
+            }
+          }
+        }
+      }
+
       .newInvoice-products-table {
         margin-top: 20px;
         background: #fff;
         position: relative;
         min-height: 400px;
+        @include lg {
+          display: none;
+        }
 
         table {
           width: 100%;
@@ -350,10 +462,8 @@
 
             &.disc-data {
               position: relative;
+
               select {
-                position: absolute;
-                top: 13px;
-                left: 225px;
                 padding: 8px 10px;
                 border: 1px solid #ddd;
                 border-radius: 8px;
@@ -361,6 +471,7 @@
                 color: #333;
                 margin: auto;
                 z-index: 200;
+                margin-left: 5px;
               }
             }
           }
@@ -423,6 +534,10 @@
             align-items: center;
             gap: 10px;
 
+            @include sm {
+              width: 100%;
+            }
+
             .table-icon {
               width: 50px;
               height: 50px;
@@ -431,6 +546,11 @@
 
             p {
               color: $secondary-color;
+              text-align: center;
+
+              @include sm {
+                font-size: 14px;
+              }
             }
 
             button {
@@ -450,6 +570,11 @@
       display: flex;
       padding: 10px 30px;
       gap: 30px;
+
+      @include md {
+        flex-direction: column-reverse;
+        padding: 0px;
+      }
 
       .product-summary-left {
         flex: 4;
@@ -543,6 +668,60 @@
           }
         }
 
+        .product-payment-receive {
+          display: flex;
+          align-items: center;
+          margin: 20px 0px;
+          gap: 30px;
+          p {
+            color: $secondary-color;
+            font-weight: bold;
+          }
+
+          .checkbox {
+            display: none;
+          }
+
+          .slider {
+            width: 60px;
+            height: 30px;
+            background-color: lightgray;
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            border: 4px solid transparent;
+            transition: 0.3s;
+            box-shadow: 0 0 10px 0 rgb(0, 0, 0, 0.25) inset;
+            cursor: pointer;
+          }
+
+          .slider::before {
+            content: "";
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            transform: translateX(-30px);
+            border-radius: 20px;
+            transition: 0.3s;
+            box-shadow: 0 0 10px 3px rgb(0, 0, 0, 0.25);
+          }
+
+          .checkbox:checked ~ .slider::before {
+            transform: translateX(30px);
+            box-shadow: 0 0 10px 3px rgb(0, 0, 0, 0.25);
+          }
+
+          .checkbox:checked ~ .slider {
+            background-color: #2196f3;
+          }
+
+          .checkbox:active ~ .slider::before {
+            transform: translate(0);
+          }
+        }
+
         .product-summary-bank {
           display: flex;
           flex-direction: column;
@@ -552,6 +731,12 @@
           .product-summary-bank-top {
             display: flex;
             align-items: center;
+
+            @include md {
+              flex-direction: column;
+              align-items: normal;
+              gap: 10px;
+            }
             span {
               font-weight: bold;
               color: $secondary-color;
@@ -664,6 +849,11 @@
             display: flex;
             justify-content: space-between;
 
+            @include lg {
+              flex-direction: column;
+              gap: 10px;
+            }
+
             span {
               font-weight: bold;
               color: $secondary-color;
@@ -684,6 +874,11 @@
             display: flex;
             justify-content: space-between;
             margin-top: 10px;
+
+            @include md {
+              flex-direction: column;
+              max-width: 400px;
+            }
 
             .product-summary-paid-item {
               display: flex;
@@ -708,26 +903,24 @@
             }
           }
 
-              
-          .product-amount-balance{
+          .product-amount-balance {
             display: flex;
             flex-direction: column;
             align-items: end;
             margin-top: 30px;
 
-            p{
-            &:first-child{
-              font-size: 20px;
-              font-weight: bold;
-              margin-bottom: 5px;
-            }
+            p {
+              &:first-child {
+                font-size: 20px;
+                font-weight: bold;
+                margin-bottom: 5px;
+              }
 
-            &:last-child{
-              color: #008000;
-            }
+              &:last-child {
+                color: #008000;
+              }
             }
           }
-
         }
 
         .product-summary-sig {
@@ -773,34 +966,19 @@
             margin-top: 5px;
           }
         }
+      }
+    }
+    .product-summary-btn {
+      margin-top: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: end;
+      gap: 10px;
+      margin-right: 30px;
 
-        .product-summary-btn {
-          margin-top: 30px;
-          display: flex;
-          justify-content: flex-end;
-          gap: 10px;
-
-          // button {
-          //   &:first-child {
-          //     background: #e8e8ed;
-          //     color: #000;
-          //   }
-
-          //   &:last-child {
-          //     gap: 5px;
-
-          //     &:hover {
-          //       .right-arrow {
-          //         transform: translateX(5px);
-          //       }
-          //     }
-          //     .right-arrow {
-          //       width: 20px;
-          //       transition: all 0.3s ease-in-out;
-          //     }
-          //   }
-          // }
-        }
+      @include md {
+        justify-content: center;
+        margin-right: 0px;
       }
     }
   }

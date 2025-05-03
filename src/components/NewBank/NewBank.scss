@@ -18,6 +18,10 @@
     padding: 20px;
     overflow-y: auto;
 
+    @include sm{
+      padding: 10px;
+    }
+
     .newBank-top {
       display: flex;
       justify-content: space-between;
@@ -25,6 +29,13 @@
         display: flex;
         align-items: center;
         gap: 5px;
+
+        h2{
+          @include sm{
+            font-size: 20px;
+          }
+        }
+
 
         .cross-icon {
           font-size: 30px;
@@ -55,6 +66,10 @@
         flex-direction: column;
         gap: 10px;
         border-radius: 5px;
+
+        @include sm{
+          padding: 10px;
+        }
         .form-group {
           display: flex;
           flex-direction: column;

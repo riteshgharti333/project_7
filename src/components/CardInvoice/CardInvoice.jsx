@@ -2,13 +2,17 @@ import "./CardInvoice.scss";
 
 import { RxCross2 } from "react-icons/rx";
 import { ArrowRight, CirclePlus } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+import axios from "axios";
+import { baseUrl } from "../../main";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const CardInvoice = ({ invoiceSmData, setOpenInvoiceCard, title }) => {
   const handleClose = () => {
     setOpenInvoiceCard(false);
   };
-
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
@@ -39,6 +43,7 @@ const CardInvoice = ({ invoiceSmData, setOpenInvoiceCard, title }) => {
     signature,
     payments,
     products,
+    moneyReceived,
   } = invoiceSmData;
 
   const shortId = _id?.slice(-6);
@@ -49,16 +54,51 @@ const CardInvoice = ({ invoiceSmData, setOpenInvoiceCard, title }) => {
     title === "Quotation" ? invoiceSmData.quotationDate : invoiceDate
   );
 
-  console.log(invoiceSmData)
+  const [moneyRec, setMoneyRec] = useState(moneyReceived);
+
+  const handleCheckboxChange = async (e) => {
+    const isChecked = e.target.checked;
+    setMoneyRec(isChecked);
+    await updateInvoice(isChecked);
+  };
+
+  const navigate = useNavigate();
+
+  const endpoint = `${baseUrl}/${
+    title === "Quotation" ? "quotation" : "invoice"
+  }/${_id}`;
+
+  const updateInvoice = async (newValue) => {
+    try {
+      const { data } = await axios.put(endpoint, {
+        moneyReceived: newValue,
+      });
+
+      const updatedDoc =
+        title === "Quotation" ? data?.quotation : data?.invoice;
+
+      if (updatedDoc) {
+        const successMsg = updatedDoc.moneyReceived
+          ? "Payment received"
+          : "Payment not received";
+
+        toast.success(successMsg);
+        setMoneyRec(updatedDoc.moneyReceived);
+        navigate(0);
+      }
+    } catch (error) {
+      console.error("Error updating invoice:", error);
+      setMoneyRec(!newValue);
+      toast.error("Failed to update payment status");
+    }
+  };
+
   return (
     <div className="cardInvoice">
       <div className="cardInvoice-container">
         <div className="cardInvoice-top">
           <div className="cardInvoice-top-left">
-            <RxCross2
-              className="cross-icon"
-              onClick={handleClose} // Cross icon click
-            />
+            <RxCross2 className="cross-icon" onClick={handleClose} />
             <h2>{title}</h2>
           </div>
 
@@ -132,7 +172,7 @@ const CardInvoice = ({ invoiceSmData, setOpenInvoiceCard, title }) => {
                   <td>{item.quantity}</td>
                   <td>₹{item.unitPrice}</td>
                   <td>
-                  ₹{item.totalAmount} (Discount: {item.discountType}
+                    ₹{item.totalAmount} (Discount: {item.discountType}
                     {item.discount})
                   </td>
                 </tr>
@@ -143,7 +183,9 @@ const CardInvoice = ({ invoiceSmData, setOpenInvoiceCard, title }) => {
           <div className="cardInvoice-total-amount">
             <div className="cardInvoice-total-amount-item">
               <p>Extra Discount:</p>
-              <span>{extraDiscountType} {extraDiscount}</span>
+              <span>
+                {extraDiscountType} {extraDiscount}
+              </span>
             </div>
             <div className="cardInvoice-total-amount-item">
               <p>Total Amount:</p>
@@ -164,6 +206,19 @@ const CardInvoice = ({ invoiceSmData, setOpenInvoiceCard, title }) => {
             </div>
           </div>
 
+          <div className="cardInvoice-received">
+            <p> Money received </p>
+
+            <label class="switch">
+              <input
+                type="checkbox"
+                className="checkbox"
+                checked={moneyRec}
+                onChange={handleCheckboxChange}
+              />
+              <div class="slider"></div>
+            </label>
+          </div>
           <div className="cardInvoice-payments">
             <p>Payments</p>
             <span>{payments[0].mode}</span>

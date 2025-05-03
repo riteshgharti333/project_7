@@ -66,7 +66,7 @@ const NewProduct = ({ setOpenProduct, handleProductData }) => {
           </div>
 
           <LoadingButton isLoading={isLoading} onClick={handleSave}>
-            Save Product <ArrowRight size={20} />
+            Save <ArrowRight size={20} />
           </LoadingButton>
         </div>
 

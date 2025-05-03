@@ -1,5 +1,7 @@
-import { useState } from "react";
 import "./NewSig.scss";
+
+import { useState } from "react";
+
 import { RxCross2 } from "react-icons/rx";
 import { ArrowRight } from "lucide-react";
 import { FaPlus } from "react-icons/fa";
@@ -83,16 +85,20 @@ const NewSig = ({ setOpensig, handleSigData }) => {
                 <span>*</span> Upload
               </label>
               <div className="add-sig">
-                <FaPlus />
-                <input
-                  type="file"
-                  id="signatureImage"
-                  accept="image/*"
-                  onChange={(e) => setSignatureImage(e.target.files[0])}
-                />
-                <p>
-                  {signatureImage ? signatureImage.name : "Upload signature"}
-                </p>
+                <label htmlFor="signatureImage">
+                  <FaPlus className="add-sig-icon" />
+                  <input
+                    type="file"
+                    id="signatureImage"
+                    accept="image/*"
+                    onChange={(e) => setSignatureImage(e.target.files[0])}
+                    style={{ display: "none" }}
+                  />
+
+                  <p>
+                    {signatureImage ? signatureImage.name : "Upload signature"}
+                  </p>
+                </label>
               </div>
             </div>
           </form>

@@ -352,6 +352,7 @@ const NewQuotation = () => {
     paymentAmount: 0,
     paymentMode: "UPI",
     isFullyPaid: false,
+    moneyReceived: false,
   });
 
   useEffect(() => {
@@ -421,6 +422,7 @@ const NewQuotation = () => {
         status,
         extraDiscount: extraDiscount || 0,
         extraDiscountType: invoiceForm.extraDiscountType === "₹" ? "₹" : "%",
+        moneyReceived: invoiceForm.moneyReceived,
 
         payments: [
           {
@@ -453,15 +455,12 @@ const NewQuotation = () => {
       }
     } catch (error) {
       console.error("Error creating quotation:", error);
-      toast.error(error.response?.data?.message || "Failed to create quotation");
+      toast.error(
+        error.response?.data?.message || "Failed to create quotation"
+      );
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Handle save as draft
-  const handleSaveDraft = () => {
-    submitInvoice("draft");
   };
 
   // Handle save and submit
@@ -470,8 +469,6 @@ const NewQuotation = () => {
   };
 
   //////////////////
-
-  console.log(productData);
 
   return (
     <div className="newInvoice">
@@ -551,6 +548,17 @@ const NewQuotation = () => {
               )}
             </div>
           </div>
+          {openCross && customerData && (
+            <div className="customer-name-sm">
+              <p>
+                {customerData.name}
+                <MdClose
+                  className="cross-icon"
+                  onClick={() => setOpenCross(false)}
+                />
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="newInvoice-customer-right">
@@ -655,6 +663,87 @@ const NewQuotation = () => {
                 <CirclePlus className="plus-icon" /> Add to Bill
               </button>
             </div> */}
+          </div>
+
+          <div className="newInvoice-sm-table">
+            {productData?.map((item, index) => (
+              <div className="newInvoice-sm-table-items">
+                <div className="newInvoice-sm-table-item">
+                  <p>Product Name</p>
+                  <span>{item.name}</span>
+                </div>
+
+                <div className="newInvoice-sm-table-item">
+                  <p>Unit Price </p>
+                  <input
+                    className="product-item"
+                    type="number"
+                    placeholder="Unit Price"
+                    value={item.unit}
+                    onChange={(e) => {
+                      const value = Math.max(0, Number(e.target.value));
+                      const newData = [...productData];
+                      newData[index].unit = value;
+                      setProductData(newData);
+                    }}
+                  />
+                </div>
+
+                <div className="newInvoice-sm-table-item">
+                  <p>Quantity </p>
+                  <input
+                    className="product-item"
+                    type="number"
+                    placeholder="Qty"
+                    value={item.price}
+                    onChange={(e) => {
+                      const value = Math.max(0, Number(e.target.value));
+                      const newData = [...productData];
+                      newData[index].price = value;
+                      setProductData(newData);
+                    }}
+                  />
+                </div>
+
+                <div className="newInvoice-sm-table-item">
+                  <p>Discount On</p>
+                  <input
+                    className="product-item"
+                    type="number"
+                    placeholder="Discount"
+                    value={item.discount}
+                    onChange={(e) => {
+                      const value = Math.max(0, Number(e.target.value));
+                      const newData = [...productData];
+                      newData[index].discount = value;
+                      setProductData(newData);
+                    }}
+                  />
+                  <select
+                    value={item.discountType}
+                    onChange={(e) => {
+                      const newData = [...productData];
+                      newData[index].discountType = e.target.value;
+                      setProductData(newData);
+                    }}
+                  >
+                    <option value="%">%</option>
+                    <option value="₹">₹</option>
+                  </select>
+                </div>
+
+                <div className="newInvoice-sm-table-item">
+                  <p>Total</p>
+                  <span> {calculateNetAmount(item)}</span>
+                </div>
+                  <div className="newInvoice-sm-table-item">
+                                  <Trash
+                                    className="trash-icon"
+                                    onClick={() => handleDeleteProduct(index)}
+                                  />
+                                </div>
+              </div>
+            ))}
           </div>
 
           <div className="newInvoice-products-table">
@@ -848,6 +937,22 @@ const NewQuotation = () => {
                 </div>
               </div>
             </div>
+
+            <div className="product-payment-receive">
+              <p> Money received </p>
+
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  name="moneyReceived"
+                  className="checkbox"
+                  checked={invoiceForm.moneyReceived}
+                  onChange={handleInputChange}
+                />
+                <div class="slider"></div>
+              </label>
+            </div>
+
             <div className="product-summary-bank">
               <div className="product-summary-bank-top">
                 <span>Select Bank</span>
@@ -997,13 +1102,14 @@ const NewQuotation = () => {
               </div>
             )}
 
-            <div className="product-summary-btn">
+           
+          </div>
+        </div>
+        <div className="product-summary-btn">
               <LoadingButton isLoading={isLoading} onClick={handleSubmit}>
                 Save <ArrowRight className="right-arrow" />
               </LoadingButton>
             </div>
-          </div>
-        </div>
       </div>
     </div>
   );

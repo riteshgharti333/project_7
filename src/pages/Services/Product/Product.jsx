@@ -63,14 +63,13 @@ const Product = () => {
 
   const [selectedRange, setSelectedRange] = useState(weekOptions[1]);
 
-  const [prouducts, setProducts] = useState([]);
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const { data } = await axios.get(`${baseUrl}/product/all-products`);
         setProducts(data?.products);
-        console.log(data);
       } catch (error) {
         console.error("Failed to fetch customers", error);
       }
@@ -86,8 +85,8 @@ const Product = () => {
   };
 
   const filteredData = useMemo(() => {
-    if (activeFilter === "All") return prouducts;
-    return prouducts.filter((item) => item.status === activeFilter);
+    if (activeFilter === "All") return products;
+    return products.filter((item) => item.status === activeFilter);
   }, [activeFilter]);
 
   const columns = useMemo(
@@ -112,7 +111,7 @@ const Product = () => {
   );
 
   const table = useReactTable({
-    data: prouducts,
+    data: products,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -125,7 +124,7 @@ const Product = () => {
   });
 
   const handleRowClick = (product) => {
-    setProductdata(product)
+    setProductdata(product);
     setOpenCardProduct(true);
   };
 
@@ -136,7 +135,10 @@ const Product = () => {
       {openProduct && <NewProduct setOpenProduct={setOpenProduct} />}
 
       {openCardProduct && (
-        <CardProduct product={productData}  setOpenCardProduct={setOpenCardProduct}/>
+        <CardProduct
+          product={productData}
+          setOpenCardProduct={setOpenCardProduct}
+        />
       )}
       <div className="product-top">
         <h1>Product</h1>
@@ -172,7 +174,32 @@ const Product = () => {
         </div> */}
       </div>
 
-      <div className="table">
+      <div className="product-sm">
+        <div className="product-sm-items">
+          {products?.map((item, index) => (
+            <div
+              className="product-sm-item"
+              key={index}
+              onClick={() => {
+                setProductdata(item);
+                setOpenCardProduct(true);
+              }}
+            >
+              <div className="product-sm-item-left">
+                <p>{item.name}</p>
+                <span>Qty/{item.unit}</span>
+              </div>
+
+              <div className="product-sm-item-right">
+                <span>Selling Price</span>
+                <p>₹{item.price}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="product-table">
         <table>
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (

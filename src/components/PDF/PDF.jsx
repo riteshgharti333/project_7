@@ -14,6 +14,10 @@ import { baseUrl } from "../../main";
 import { useRef } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { toast } from "sonner";
+import { IoIosArrowDown } from "react-icons/io";
+import { IoMailUnreadOutline } from "react-icons/io5";
+import { FaWhatsapp } from "react-icons/fa";
 
 const PDF = () => {
   const { name, id } = useParams();
@@ -64,8 +68,6 @@ const PDF = () => {
     };
     getAllInvoice();
   }, []);
-
-  console.log(data);
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
@@ -128,11 +130,176 @@ const PDF = () => {
   }
   const navigate = useNavigate();
 
+  const [isSending, setIsSending] = useState(false);
+
+  const handleSendEmail = async () => {
+    const email = customer?.email;
+    setIsSending(true);
+
+    try {
+      await toast.promise(
+        (async () => {
+          // 1. Generate PDF
+          const canvas = await html2canvas(pdfRef.current, {
+            scale: 2,
+            useCORS: true,
+            logging: true, // You can remove this later
+          });
+
+          const pdf = new jsPDF("p", "mm", "a4");
+          const imgData = canvas.toDataURL("image/jpeg", 0.7);
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const imgWidth = pdfWidth - 20;
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          pdf.addImage(imgData, "JPEG", 10, 10, imgWidth, imgHeight);
+
+          const pdfBlob = pdf.output("blob");
+
+          const formData = new FormData();
+          formData.append("pdf", pdfBlob, `${name}_${id}.pdf`);
+          formData.append("recipientEmail", email);
+          formData.append(
+            "subject",
+            `${name === "quotation" ? "Quotation" : "Invoice"} #${id.slice(-6)}`
+          );
+          formData.append(
+            "message",
+            `Dear ${data.customer?.name},\n\nPlease find attached your document.`
+          );
+
+          await axios.post(`${baseUrl}/invoice/send-email`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+        })(),
+        {
+          loading: `Sending to ${email}...`,
+          success: "Email sent successfully!",
+          error: (err) =>
+            err?.response?.data?.message || "Failed to send email",
+        }
+      );
+    } catch (error) {
+      console.error("Error sending email:", error);
+    } finally {
+      setIsSending(false); // Re-enable the button after the process
+    }
+  };
+
+  const [openSend, setOpenSend] = useState(false);
+
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenSend(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+
+
+  const handleSendWhatsApp = async () => {
+    const phone = customer?.phone;
+    if (!phone) {
+      toast.error("Customer phone number is required");
+      return;
+    }
+  
+    setIsSending(true);
+  
+    try {
+      await toast.promise(
+        (async () => {
+          // 1. Generate PDF
+          const canvas = await html2canvas(pdfRef.current, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+          });
+  
+          const pdf = new jsPDF("p", "mm", "a4");
+          const imgData = canvas.toDataURL("image/jpeg", 0.7);
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const imgWidth = pdfWidth - 20;
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          pdf.addImage(imgData, "JPEG", 10, 10, imgWidth, imgHeight);
+  
+          // Convert PDF to blob
+          const pdfBlob = pdf.output("blob");
+          
+          // Create FormData to send to backend
+          const formData = new FormData();
+          formData.append("pdf", pdfBlob, `${name}_${shortId}.pdf`);
+          formData.append("recipientPhone", phone);
+          formData.append(
+            "message",
+            `Dear ${customer?.name},\n\nPlease find attached your ${name === "quotation" ? "quotation" : "invoice"} #${shortId}.`
+          );
+  
+          // Send to your backend which will use Twilio
+          const response = await axios.post(
+            `${baseUrl}/send-whatsapp-twilio`,
+            formData,
+            {
+              headers: { "Content-Type": "multipart/form-data" },
+            }
+          );
+  
+          return response;
+        })(),
+        {
+          loading: `Sending to ${phone}...`,
+          success: "WhatsApp message sent successfully!",
+          error: (err) => {
+            console.error("WhatsApp sending error:", err);
+            return err.response?.data?.message || "Failed to send WhatsApp message";
+          }
+        }
+      );
+    } catch (error) {
+      console.error("Error sending WhatsApp:", error);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   return (
     <div className="pdf">
       <div className="pdf-back">
-        <FaArrowLeftLong className="back-icon" onClick={() => navigate(-1)} />
-        <button onClick={handleDownloadPDF}>Download PDF</button>
+        <div className="pdf-back-left">
+          <FaArrowLeftLong className="back-icon" onClick={() => navigate(-1)} />
+        </div>
+        <div className="pdf-back-right">
+          <button onClick={handleDownloadPDF}>Download PDF</button>
+          <span onClick={() => setOpenSend(!openSend)}>
+            Send <IoIosArrowDown />
+          </span>
+          {openSend && (
+            <div className="pdf-send-dropdown" ref={dropdownRef}>
+              <p
+                onClick={!isSending ? handleSendEmail : null}
+                style={{
+                  pointerEvents: isSending ? "none" : "auto",
+                  opacity: isSending ? 0.6 : 1,
+                  cursor: isSending ? "not-allowed" : "pointer",
+                }}
+              >
+                <IoMailUnreadOutline className="mail-icon" />{" "}
+                {isSending ? "Sending..." : "Email"}
+              </p>
+
+              <p>
+                <FaWhatsapp className="mail-icon" /> Whatsapp
+              </p>
+            </div>
+          )}
+        </div>
       </div>
       <div className="pdf-main" ref={pdfRef}>
         <div className="pdf-container">

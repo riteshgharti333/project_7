@@ -3,32 +3,86 @@
 .pdf {
   position: relative;
   .pdf-back {
-    position: absolute;
+    // position: absolute;
     display: flex;
     justify-content: space-between;
     width: 100%;
-    top: 10px;
-
-    .back-icon {
-      margin-left: 10px;
-      font-size: 30px;
-      cursor: pointer;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    .pdf-back-left {
+      .back-icon {
+        margin-left: 10px;
+        font-size: 30px;
+        cursor: pointer;
+      }
     }
+    .pdf-back-right {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      button {
+        margin-right: 10px;
+        padding: 10px 15px;
+        background: $primary-color;
+        border: none;
+        font-size: 16px;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: all 0.3s ease-in-out;
 
-    button {
-      margin-right: 10px;
-      padding: 10px 15px;
-      background: $primary-color;
-      border: none;
-      font-size: 16px;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 5px;
-      transition: all 0.3s ease-in-out;
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
 
-      &:hover {
-        transform: scale(1.05);
+      span {
+        margin-right: 10px;
+        padding: 10px 15px;
+        background: #008000;
+        border: none;
+        font-size: 16px;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: all 0.3s ease-in-out;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .pdf-send-dropdown {
+        border: 1px solid #000;
+        width: 130px;
+        border-radius: 5px;
+        p {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          padding: 8px 5px;
+          cursor: pointer;
+          &:last-child {
+            color: #25d366;
+            border-bottom: 1px solid #ddd;
+
+            &:hover {
+              background: #25d366;
+              color: #fff;
+            }
+          }
+
+          &:first-child {
+            color: #007bff;
+            &:hover {
+              background: #007bff;
+              color: #fff;
+            }
+          }
+        }
       }
     }
   }

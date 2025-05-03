@@ -207,9 +207,9 @@ const Report = () => {
     link.click();
   };
 
-  if (loading) {
-    return <div className="loading">Loading reports...</div>;
-  }
+  // if (loading) {
+  //   return <div className="loading">Loading reports...</div>;
+  // }
 
   return (
     <div className="report">
@@ -218,11 +218,11 @@ const Report = () => {
           <ChevronLeft size={30} />
           <h3>Business Insights Report</h3>
         </Link>
-        <div className="report-actions">
+        {/* <div className="report-actions">
           <button onClick={() => window.print()} className="print-btn">
             <Printer size={18} /> Print Report
           </button>
-        </div>
+        </div> */}
       </div>
 
       <div className="report-content">

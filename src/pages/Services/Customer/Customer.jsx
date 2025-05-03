@@ -128,7 +128,6 @@ const Customer = () => {
     }
   }, [customers]);
 
-  
   const handleWeekChange = (option) => {
     setSelectedRange(option);
     // Optional: apply filtering logic here
@@ -194,6 +193,18 @@ const Customer = () => {
 
   const [openCustomer, setOpenCustomer] = useState(false);
 
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      return "Invalid date";
+    }
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }).format(date);
+  };
+
   return (
     <div className="customer">
       {openCustomer && <NewCustomer setOpenCustomer={setOpenCustomer} />}
@@ -238,7 +249,33 @@ const Customer = () => {
         </div> */}
       </div>
 
-      <div className="table">
+      <div className="customer-sm">
+        <div className="customer-sm-items">
+          {filteredData.map((item, index) => (
+            <div
+              className="customer-sm-item"
+              key={index}
+              onClick={() => {
+                setOpenCustomerCard(true);
+                setSelectedInvoice(item);
+              }}
+            >
+              <div className="customer-sm-item-left">
+                <p>{item.name}</p>
+                <span>{item.phone}</span>
+              </div>
+
+              <div className="customer-sm-item-right">
+                <span>Closing Balance</span>
+                <p>₹{item.closingBalance}</p>
+                <span>{formatDate(item.createdAt)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="customer-table">
         <table>
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (

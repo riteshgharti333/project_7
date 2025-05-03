@@ -18,6 +18,10 @@
     padding: 20px;
     overflow-y: auto;
 
+    @include sm {
+      padding: 10px;
+    }
+
     .newSig-top {
       display: flex;
       justify-content: space-between;
@@ -25,7 +29,11 @@
         display: flex;
         align-items: center;
         gap: 5px;
-
+        h2 {
+          @include sm {
+            font-size: 20px;
+          }
+        }
         .cross-icon {
           font-size: 30px;
           stroke-width: 1;
@@ -54,6 +62,10 @@
         flex-direction: column;
         gap: 10px;
         border-radius: 5px;
+
+        @include sm {
+          padding: 10px;
+        }
         .form-group {
           display: flex;
           flex-direction: column;
@@ -72,6 +84,31 @@
             padding: 20px;
             border-radius: 5px;
             cursor: pointer;
+
+            transition: all 0.3s ease-in-out;
+
+            &:hover {
+              border: 1px dashed $primary-color;
+              .add-sig-icon {
+                color: $primary-color;
+                transition: all 0.3s ease-in-out;
+              }
+
+              p {
+                color: $primary-color;
+                transition: all 0.3s ease-in-out;
+              }
+            }
+            label {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              cursor: pointer;
+            }
+
+            .add-sig-icon {
+              margin-bottom: 10px;
+            }
           }
 
           label {
