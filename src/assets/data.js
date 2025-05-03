@@ -10,11 +10,11 @@ import {
 } from "lucide-react";
 
 export const sidebarItems = [
-  {
-    icon: LayoutDashboard,
-    title: "Dashboard",
-    link: "",
-  },
+  // {
+  //   icon: LayoutDashboard,
+  //   title: "Dashboard",
+  //   link: "",
+  // },
   {
     icon: ReceiptText,
     title: "Invoice",

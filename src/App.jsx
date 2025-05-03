@@ -17,6 +17,7 @@ import Billing from "./pages/Services/Billing/Billing";
 import PDF from "./components/PDF/PDF";
 import SmPDF from "./pages/SmPDF/SmPDF";
 import DownloadPDF from "./components/DownloadPDF/DownloadPDF";
+import { BottomBar } from "./components/BottomBar/BottomBar";
 
 function App() {
   return (
@@ -25,7 +26,7 @@ function App() {
         <Toaster position="top-center" richColors />
         <Routes>
           <Route element={<Layout />}>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Invoice />} />
             <Route path="/invoice" element={<Invoice />} />
             <Route path="/customer" element={<Customer />} />
             <Route path="/product" element={<Product />} />

@@ -1,0 +1,49 @@
+@use "../../styles/responsive.scss" as *;
+
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+//   height: 60px; 
+
+  @media (min-width: "1025px") {
+    display: none;
+  }
+
+  .bottom-bar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    color: $secondary-color;
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+
+   @include sm{
+    padding: 5px;
+   }
+
+    svg {
+      stroke-width: 1.5;
+    }
+
+    &.active {
+      color: $primary-color;
+      background: rgba($primary-color, 0.1);
+
+      svg {
+        stroke-width: 2;
+      }
+    }
+  }
+}

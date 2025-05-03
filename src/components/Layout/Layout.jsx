@@ -2,6 +2,7 @@ import "./Layout.scss";
 import Navbar from "../../components/Navbar/Navbar";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { Outlet } from "react-router-dom";
+import { BottomBar } from "../BottomBar/BottomBar";
 
 const Layout = () => {
   return (
@@ -14,6 +15,8 @@ const Layout = () => {
         <div className="layout-right">
           <div className="layout-nav">
             <Navbar />
+            <BottomBar />
+            
           </div>
 
           <div className="layout-content">
