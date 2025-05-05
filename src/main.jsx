@@ -4,7 +4,7 @@ import App from "./App.jsx";
 
 import "./styles/global.scss";
 import { LoadingProvider } from "./Context/LoadingContext.jsx";
-import { ContextProvider } from "./context/Context.jsx";
+import { ContextProvider } from "./Context/Context.jsx";
 
 export const baseUrl = import.meta.env.VITE_BASE_URL;
 
