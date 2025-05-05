@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { FiUser, FiMail, FiLock, FiEdit, FiCheck, FiX } from "react-icons/fi";
 import "./Profile.scss";
-import { Context } from "../../context/Context";
+import { Context } from "../../Context/Context";
 import { baseUrl } from "../../main";
 import { toast } from "sonner";
 import axios from "axios";

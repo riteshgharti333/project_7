@@ -6,7 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { baseUrl } from "../../main";
 import axios from "axios";
 import { toast } from "sonner";
-import { Context } from "../../context/Context";
+import { Context } from "../../Context/Context";
 import { useContext, useState } from "react";
 
 const Navbar = () => {

@@ -7,7 +7,7 @@ import { baseUrl } from "../../main";
 import { useContext, useState } from "react";
 import { toast } from "sonner";
 import axios from "axios";
-import { Context } from "../../context/Context";
+import { Context } from "../../Context/Context";
 
 import logo from "../../assets/images/logo.png";
 
