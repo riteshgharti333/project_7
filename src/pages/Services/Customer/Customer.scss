@@ -4,8 +4,14 @@
   .customer-top {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+
+    h1{
+      font-size: 25px;
+    }
     .primary-btn {
       gap: 5px;
+      padding: 10px 5px;
     }
   }
 
@@ -73,47 +79,47 @@
   }
 }
 
-.customer-sm{
+.customer-sm {
   margin-top: 30px;
-  
+
   @media (min-width: "769px") {
     display: none;
   }
 
-  .customer-sm-items{
+  .customer-sm-items {
     display: flex;
 
     flex-direction: column;
     gap: 20px;
-    .customer-sm-item{
+    .customer-sm-item {
       display: flex;
       justify-content: space-between;
       padding: 10px;
       background: #fff;
       box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
       border-radius: 5px;
-      .customer-sm-item-left{
-           p{
-            color: $primary-color;
-            font-weight: bold;
-            margin-bottom: 10px;
-            font-size: 18px;
-           }
-           span{
-            font-weight: bold;
-            color: $secondary-color;
-           }
+      .customer-sm-item-left {
+        p {
+          color: $primary-color;
+          font-weight: bold;
+          margin-bottom: 10px;
+          font-size: 18px;
+        }
+        span {
+          font-weight: bold;
+          color: $secondary-color;
+        }
       }
-      .customer-sm-item-right{
-        p{
+      .customer-sm-item-right {
+        p {
           font-weight: bold;
           margin: 5px 0px;
           font-size: 25px;
-         }
-        span{
+        }
+        span {
           font-weight: bold;
           color: $secondary-color;
-         }
+        }
       }
     }
   }
@@ -132,7 +138,7 @@
   flex-direction: column;
   justify-content: space-between;
 
-  @include md{
+  @include md {
     display: none;
   }
 

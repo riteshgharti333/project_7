@@ -1,9 +1,8 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import { Toaster } from "sonner";
 
 import Layout from "./components/Layout/Layout";
-import Dashboard from "./pages/Dashboard/Dashboard";
 import Invoice from "./pages/Services/Invoice/Invoice";
 
 import NewInvoice from "./pages/NewPages/NewInvoice/NewInvoice";
@@ -17,21 +16,32 @@ import Billing from "./pages/Services/Billing/Billing";
 import PDF from "./components/PDF/PDF";
 import SmPDF from "./pages/SmPDF/SmPDF";
 import DownloadPDF from "./components/DownloadPDF/DownloadPDF";
-import { BottomBar } from "./components/BottomBar/BottomBar";
+import { useContext } from "react";
+import { Context } from "./context/Context";
+
+import Login from "./pages/Login/Login";
+import Profile from "./pages/Profile/Profile";
 
 function App() {
+  const { user } = useContext(Context);
   return (
     <div className="app">
       <BrowserRouter>
         <Toaster position="top-center" richColors />
         <Routes>
-          <Route element={<Layout />}>
+          <Route
+            path="/login"
+            element={user ? <Navigate to="/" /> : <Login />}
+          />
+          <Route element={user ? <Layout /> : <Navigate to="/login" />}>
             <Route path="/" element={<Invoice />} />
             <Route path="/invoice" element={<Invoice />} />
             <Route path="/customer" element={<Customer />} />
             <Route path="/product" element={<Product />} />
             <Route path="/quotation" element={<Quotation />} />
             <Route path="/billing" element={<Billing />} />
+            <Route path="/profile" element={<Profile />} />
+
             <Route path="/download-pdf" element={<DownloadPDF />} />
           </Route>
           <Route path="/new-invoice" element={<NewInvoice />} />

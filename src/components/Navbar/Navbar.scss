@@ -45,14 +45,13 @@
   }
 
   .navbar-right {
-    button {
+    .primary-btn {
       display: flex;
       align-items: center;
       gap: 10px;
 
       .login-icon {
-        width: 20px;
-        height: 20px;
+        font-size: 20px;
         font-weight: bold;
       }
     }

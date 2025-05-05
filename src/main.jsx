@@ -4,13 +4,16 @@ import App from "./App.jsx";
 
 import "./styles/global.scss";
 import { LoadingProvider } from "./Context/LoadingContext.jsx";
+import { ContextProvider } from "./context/Context.jsx";
 
 export const baseUrl = import.meta.env.VITE_BASE_URL;
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <LoadingProvider>
-      <App />
-    </LoadingProvider>
+    <ContextProvider>
+      <LoadingProvider>
+        <App />
+      </LoadingProvider>
+    </ContextProvider>
   </StrictMode>
 );
