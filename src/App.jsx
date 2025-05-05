@@ -17,7 +17,7 @@ import PDF from "./components/PDF/PDF";
 import SmPDF from "./pages/SmPDF/SmPDF";
 import DownloadPDF from "./components/DownloadPDF/DownloadPDF";
 import { useContext } from "react";
-import { Context } from "./context/Context";
+import { Context } from "./Context/Context";
 
 import Login from "./pages/Login/Login";
 import Profile from "./pages/Profile/Profile";
