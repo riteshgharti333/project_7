@@ -26,7 +26,11 @@ function App() {
   const { user } = useContext(Context);
   return (
     <div className="app">
+      {/* <BrowserRouter basename="/invoice"> */}
+
       <BrowserRouter>
+
+
         <Toaster position="top-center" richColors />
         <Routes>
           <Route

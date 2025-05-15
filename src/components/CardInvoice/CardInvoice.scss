@@ -25,16 +25,32 @@
     .cardInvoice-top {
       display: flex;
       justify-content: space-between;
+
+      @include sm{
+        flex-direction: column;
+        gap: 20px;
+        
+      }
       .cardInvoice-top-left {
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap:5px;
 
         .cross-icon {
           font-size: 30px;
           stroke-width: 1;
           color: $secondary-color;
           cursor: pointer;
+        }
+      }
+
+      .cardInvoice-top-right{
+        display: flex;
+        gap: 10px;
+        button{
+          background: #FFF6CD;
+          color: #000;
+          
         }
       }
     }

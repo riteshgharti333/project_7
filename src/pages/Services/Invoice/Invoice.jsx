@@ -102,15 +102,11 @@ const Invoice = () => {
   const filteredData = useMemo(() => {
     let result = invoiceData;
 
-    // Apply status filter
     if (activeFilter !== "All") {
       result = result.filter((item) => {
-        const payment = item.payments?.[0];
-        const paymentStatus = payment
-          ? payment.isFullyPaid
-            ? "Paid"
-            : "Pending"
-          : "Pending";
+        const payments = item.payments || [];
+        const isFullyPaid = payments.some((p) => p.isFullyPaid === true);
+        const paymentStatus = isFullyPaid ? "Paid" : "Pending";
         return paymentStatus === activeFilter;
       });
     }
@@ -205,23 +201,28 @@ const Invoice = () => {
       },
       {
         header: "Payment Mode",
-        cell: (info) => info.row.original.payments?.[0]?.mode || "N/A",
+        cell: (info) => {
+          const payments = info.row.original.payments;
+          return payments && payments.length > 0
+            ? payments[payments.length - 1].mode
+            : "N/A";
+        },
       },
+
       {
         header: "Status",
         cell: (info) => {
-          const payment = info.row.original.payments?.[0];
-          const paymentStatus = payment
-            ? payment.isFullyPaid
-              ? "Paid"
-              : "Pending"
-            : "Pending";
-          const color = paymentStatus === "Paid" ? "green" : "#f39c12";
+          const payments = info.row.original.payments || [];
+          const isFullyPaid = payments.some((p) => p.isFullyPaid === true);
+          const paymentStatus = isFullyPaid ? "Paid" : "Pending";
+          const color = isFullyPaid ? "green" : "#f39c12";
+
           return (
             <span style={{ color, fontWeight: 600 }}>{paymentStatus}</span>
           );
         },
       },
+
       {
         accessorKey: "invoiceDate",
         header: "Date",
@@ -254,42 +255,6 @@ const Invoice = () => {
             >
               View
             </Link>
-
-            {/* <span className="view-link send-btn">
-              <p
-                onClick={(e) => {
-                  console.log(first);
-                  e.stopPropagation();
-                  setOpenSendId((prev) =>
-                    prev === info.row.original._id
-                      ? null
-                      : info.row.original._id
-                  );
-                }}
-                className="send-btn"
-              >
-                <FaTelegramPlane className="plan-icon" />
-                Send
-              </p>
-
-                <div className="send-dropdown">
-                  <p
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                  >
-                    <IoMailUnreadOutline className="mail-icon" /> Email
-                  </p>
-                  <p
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                  >
-                    <FaWhatsapp className="mail-icon" /> Whatsapp
-                  </p>
-                </div>
-            
-            </span> */}
           </div>
         ),
       },
@@ -475,14 +440,17 @@ const Invoice = () => {
                 <div className="invoice-sm-item-bill">
                   <span>
                     {item._id?.slice(-6)}{" "}
-                    <span className="mode">{item?.payments[0].mode}</span>
+                    <span className="mode">
+                      {item?.payments?.[item.payments.length - 1]?.mode ||
+                        "N/A"}
+                    </span>
                   </span>
                 </div>
 
                 <div className="invoice-sm-status">
                   <p>
                     <span>Status: </span>
-                    {item?.payments[0].isFullyPaid ? (
+                    {item?.payments?.some((p) => p.isFullyPaid) ? (
                       <span className="pay-done">Paid</span>
                     ) : (
                       <span className="pay-pending">Pending</span>

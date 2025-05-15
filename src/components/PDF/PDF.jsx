@@ -202,17 +202,15 @@ const PDF = () => {
     };
   }, []);
 
-
-
   const handleSendWhatsApp = async () => {
     const phone = customer?.phone;
     if (!phone) {
       toast.error("Customer phone number is required");
       return;
     }
-  
+
     setIsSending(true);
-  
+
     try {
       await toast.promise(
         (async () => {
@@ -222,26 +220,28 @@ const PDF = () => {
             useCORS: true,
             logging: false,
           });
-  
+
           const pdf = new jsPDF("p", "mm", "a4");
           const imgData = canvas.toDataURL("image/jpeg", 0.7);
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const imgWidth = pdfWidth - 20;
           const imgHeight = (canvas.height * imgWidth) / canvas.width;
           pdf.addImage(imgData, "JPEG", 10, 10, imgWidth, imgHeight);
-  
+
           // Convert PDF to blob
           const pdfBlob = pdf.output("blob");
-          
+
           // Create FormData to send to backend
           const formData = new FormData();
           formData.append("pdf", pdfBlob, `${name}_${shortId}.pdf`);
           formData.append("recipientPhone", phone);
           formData.append(
             "message",
-            `Dear ${customer?.name},\n\nPlease find attached your ${name === "quotation" ? "quotation" : "invoice"} #${shortId}.`
+            `Dear ${customer?.name},\n\nPlease find attached your ${
+              name === "quotation" ? "quotation" : "invoice"
+            } #${shortId}.`
           );
-  
+
           // Send to your backend which will use Twilio
           const response = await axios.post(
             `${baseUrl}/send-whatsapp-twilio`,
@@ -250,7 +250,7 @@ const PDF = () => {
               headers: { "Content-Type": "multipart/form-data" },
             }
           );
-  
+
           return response;
         })(),
         {
@@ -258,8 +258,10 @@ const PDF = () => {
           success: "WhatsApp message sent successfully!",
           error: (err) => {
             console.error("WhatsApp sending error:", err);
-            return err.response?.data?.message || "Failed to send WhatsApp message";
-          }
+            return (
+              err.response?.data?.message || "Failed to send WhatsApp message"
+            );
+          },
         }
       );
     } catch (error) {
@@ -431,11 +433,25 @@ const PDF = () => {
               <p>Total Discount </p>
               <p>-₹ {totalDiscount}</p>
             </div>
+            <div className="pdf-qty-item disc">
+              <p>Amount Paid </p>
+              <p>
+                -₹{" "}
+                {payments?.reduce(
+                  (total, payment) => total + (payment.amount || 0),
+                  0
+                )}
+              </p>
+            </div>
+            <div className="pdf-qty-item disc">
+              <p>Amount Pending </p>
+              <p>-₹ {amountBalance}</p>
+            </div>
             <div className="pdf-qty-item words">
               <p>Total amount (in words): INR {word}</p>
             </div>
             <div className="pdf-qty-item paid">
-              {payments?.[0]?.isFullyPaid ? (
+              {payments?.some((payment) => payment.isFullyPaid) ? (
                 <>
                   <img src={check_img} className="pdf-icon check" />
                   <p>Amount Paid</p>

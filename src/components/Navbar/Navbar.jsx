@@ -18,14 +18,18 @@ const Navbar = () => {
   const handleLogout = async () => {
     setLoading(true);
     try {
-      await axios.post(`${baseUrl}/auth/logout`, { withCredentials: true });
+      const { data } = await axios.post(`${baseUrl}/auth/logout`, {
+        withCredentials: true,
+      });
 
-      localStorage.removeItem("user");
-      dispatch({ type: "LOGOUT" });
-      toast.success("Logout Successfully");
-      navigate("/login");
+      if (data && data.result == 1) {
+        localStorage.removeItem("user");
+        dispatch({ type: "LOGOUT" });
+        toast.success(data.message);
+        navigate("/login");
+      }
     } catch (error) {
-      toast.error("Failed to logout. Try again!");
+      toast.error(error.response.data.message);
       console.log(error);
     } finally {
       setLoading(false);

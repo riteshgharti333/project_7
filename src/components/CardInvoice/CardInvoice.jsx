@@ -8,6 +8,7 @@ import axios from "axios";
 import { baseUrl } from "../../main";
 import { useState } from "react";
 import { toast } from "sonner";
+import CardRecord from "../CardRecord/CardRecord";
 
 const CardInvoice = ({ invoiceSmData, setOpenInvoiceCard, title }) => {
   const handleClose = () => {
@@ -93,8 +94,16 @@ const CardInvoice = ({ invoiceSmData, setOpenInvoiceCard, title }) => {
     }
   };
 
+  const [cardRecordOpen, setCardRecordOpen] = useState(false);
+
   return (
     <div className="cardInvoice">
+      {cardRecordOpen && (
+        <CardRecord
+          invoiceData={invoiceSmData}
+          setCardRecordOpen={setCardRecordOpen}
+        />
+      )}
       <div className="cardInvoice-container">
         <div className="cardInvoice-top">
           <div className="cardInvoice-top-left">
@@ -102,12 +111,21 @@ const CardInvoice = ({ invoiceSmData, setOpenInvoiceCard, title }) => {
             <h2>{title}</h2>
           </div>
 
-          <Link
-            className="primary-btn"
-            to={`/${title === "Quotation" ? "quotation" : "invoice"}/${_id}`}
-          >
-            View PDF
-          </Link>
+          <div className="cardInvoice-top-right">
+            <button
+              onClick={() => setCardRecordOpen(true)}
+              className="primary-btn"
+            >
+              Record ₹
+            </button>
+
+            <Link
+              className="primary-btn"
+              to={`/${title === "Quotation" ? "quotation" : "invoice"}/${_id}`}
+            >
+              View PDF
+            </Link>
+          </div>
         </div>
 
         <div className="cardInvoice-desc">
@@ -198,8 +216,15 @@ const CardInvoice = ({ invoiceSmData, setOpenInvoiceCard, title }) => {
             <hr />
             <div className="cardInvoice-total-amount-item">
               <p>Amount Paid:</p>
-              <span>₹{payments[0].amount}</span>
+              <span>
+                ₹
+                {payments?.reduce(
+                  (total, payment) => total + (payment.amount || 0),
+                  0
+                )}
+              </span>
             </div>
+
             <div className="cardInvoice-total-amount-item">
               <p>Amount Pending:</p>
               <span>₹{amountBalance}</span>
@@ -221,7 +246,11 @@ const CardInvoice = ({ invoiceSmData, setOpenInvoiceCard, title }) => {
           </div>
           <div className="cardInvoice-payments">
             <p>Payments</p>
-            <span>{payments[0].mode}</span>
+            <span>
+              {payments && payments.length > 0
+                ? payments[payments.length - 1].mode
+                : "N/A"}
+            </span>
           </div>
 
           <div className="cardInvoice-bank-details">
