@@ -36,7 +36,8 @@ const NewProduct = ({ setOpenProduct, handleProductData }) => {
     try {
       const { data } = await axios.post(
         `${baseUrl}/product/new-product`,
-        productData
+        productData,
+        { withCredentials: true }
       );
 
       if (data && data.product) {

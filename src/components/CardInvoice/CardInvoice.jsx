@@ -71,9 +71,15 @@ const CardInvoice = ({ invoiceSmData, setOpenInvoiceCard, title }) => {
 
   const updateInvoice = async (newValue) => {
     try {
-      const { data } = await axios.put(endpoint, {
-        moneyReceived: newValue,
-      });
+      const { data } = await axios.put(
+        endpoint,
+        {
+          moneyReceived: newValue,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       const updatedDoc =
         title === "Quotation" ? data?.quotation : data?.invoice;
@@ -90,7 +96,7 @@ const CardInvoice = ({ invoiceSmData, setOpenInvoiceCard, title }) => {
     } catch (error) {
       console.error("Error updating invoice:", error);
       setMoneyRec(!newValue);
-      toast.error("Failed to update payment status");
+      toast.error(error.response.data.message);
     }
   };
 

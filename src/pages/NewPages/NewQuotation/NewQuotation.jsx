@@ -444,7 +444,10 @@ const NewQuotation = () => {
 
       const { data } = await axios.post(
         `${baseUrl}/quotation/new-quotation`,
-        invoiceData
+        invoiceData,
+        {
+          withCredentials: true,
+        }
       );
 
       console.log(data);
@@ -736,12 +739,12 @@ const NewQuotation = () => {
                   <p>Total</p>
                   <span> {calculateNetAmount(item)}</span>
                 </div>
-                  <div className="newInvoice-sm-table-item">
-                                  <Trash
-                                    className="trash-icon"
-                                    onClick={() => handleDeleteProduct(index)}
-                                  />
-                                </div>
+                <div className="newInvoice-sm-table-item">
+                  <Trash
+                    className="trash-icon"
+                    onClick={() => handleDeleteProduct(index)}
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -1101,15 +1104,13 @@ const NewQuotation = () => {
                 <p>{sigData.signatureName}</p>
               </div>
             )}
-
-           
           </div>
         </div>
         <div className="product-summary-btn">
-              <LoadingButton isLoading={isLoading} onClick={handleSubmit}>
-                Save <ArrowRight className="right-arrow" />
-              </LoadingButton>
-            </div>
+          <LoadingButton isLoading={isLoading} onClick={handleSubmit}>
+            Save <ArrowRight className="right-arrow" />
+          </LoadingButton>
+        </div>
       </div>
     </div>
   );

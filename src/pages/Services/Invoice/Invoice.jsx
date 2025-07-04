@@ -166,7 +166,9 @@ const Invoice = () => {
 
   const handleDeleteInvoice = async (invoiceId) => {
     try {
-      const response = await axios.delete(`${baseUrl}/invoice/${invoiceId}`);
+      const response = await axios.delete(`${baseUrl}/invoice/${invoiceId}`, {
+        withCredentials: true,
+      });
       if (response.data) {
         setInvoiceData((prevData) =>
           prevData.filter((invoice) => invoice._id !== invoiceId)

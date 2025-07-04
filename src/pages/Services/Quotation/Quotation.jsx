@@ -170,7 +170,9 @@ const Quotation = () => {
 
   const handleDeleteInvoice = async (invoiceId) => {
     try {
-      const response = await axios.delete(`${baseUrl}/quotation/${invoiceId}`);
+      const response = await axios.delete(`${baseUrl}/quotation/${invoiceId}`, {
+        withCredentials: true,
+      });
       if (response.data) {
         console.log(reportData.data);
         setInvoiceData((prevData) =>
@@ -410,59 +412,59 @@ const Quotation = () => {
         </div>
       </div>
 
-        <div className="invoice-sm">
-              <div className="invoice-sm-items">
-                {filteredData?.map((item, index) => (
-                  <div className="invoice-sm-item" key={index}>
-                    <div className="invoice-sm-item-left">
-                      <div className="invoice-sm-item-top">
-                        <p>{item?.customer?.name}</p>
-                      </div>
-                      <div className="invoice-sm-item-bill">
-                        <span>
-                          {item._id?.slice(-6)}{" "}
-                          <span className="mode">{item?.payments[0].mode}</span>
-                        </span>
-                      </div>
-      
-                      <div className="invoice-sm-status">
-                        <p>
-                          <span>Status: </span>
-                          {item?.payments[0].isFullyPaid ? (
-                            <span className="pay-done">Paid</span>
-                          ) : (
-                            <span className="pay-pending">Pending</span>
-                          )}
-                        </p>
-                      </div>
-                      <div className="invoice-sm-view">
-                        <span
-                          onClick={() => {
-                            setOpenInvoiceCard(true);
-                            setSelectedInvoice(item);
-                          }}
-                          className="sm-view"
-                        >
-                          Invoice
-                        </span>
-                        <Link className="sm-view" to={`/quotation/${item?._id}`}>
-                          View
-                        </Link>
-                      </div>
-                    </div>
-                    <div className="invoice-sm-item-right">
-                      <h3>₹{item?.totalAmount}</h3>
-      
-                      <p>{formatDate(item.quotationDate)}</p>
-      
-                      <span onClick={handleDeleteInvoice}>
-                        <FaRegTrashAlt className="bin-icon" /> Delete
-                      </span>
-                    </div>
-                  </div>
-                ))}
+      <div className="invoice-sm">
+        <div className="invoice-sm-items">
+          {filteredData?.map((item, index) => (
+            <div className="invoice-sm-item" key={index}>
+              <div className="invoice-sm-item-left">
+                <div className="invoice-sm-item-top">
+                  <p>{item?.customer?.name}</p>
+                </div>
+                <div className="invoice-sm-item-bill">
+                  <span>
+                    {item._id?.slice(-6)}{" "}
+                    <span className="mode">{item?.payments[0].mode}</span>
+                  </span>
+                </div>
+
+                <div className="invoice-sm-status">
+                  <p>
+                    <span>Status: </span>
+                    {item?.payments[0].isFullyPaid ? (
+                      <span className="pay-done">Paid</span>
+                    ) : (
+                      <span className="pay-pending">Pending</span>
+                    )}
+                  </p>
+                </div>
+                <div className="invoice-sm-view">
+                  <span
+                    onClick={() => {
+                      setOpenInvoiceCard(true);
+                      setSelectedInvoice(item);
+                    }}
+                    className="sm-view"
+                  >
+                    Invoice
+                  </span>
+                  <Link className="sm-view" to={`/quotation/${item?._id}`}>
+                    View
+                  </Link>
+                </div>
+              </div>
+              <div className="invoice-sm-item-right">
+                <h3>₹{item?.totalAmount}</h3>
+
+                <p>{formatDate(item.quotationDate)}</p>
+
+                <span onClick={handleDeleteInvoice}>
+                  <FaRegTrashAlt className="bin-icon" /> Delete
+                </span>
               </div>
             </div>
+          ))}
+        </div>
+      </div>
 
       <div className="invoice-table">
         <table>

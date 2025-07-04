@@ -9,7 +9,6 @@ import { baseUrl } from "../../main";
 import { toast } from "sonner";
 import LoadingButton from "../LoadingButton/LoadingButton";
 
-
 const NewCustomer = ({ setOpenCustomer, handleCustomerData }) => {
   const handleClose = () => {
     setOpenCustomer(false);
@@ -38,10 +37,12 @@ const NewCustomer = ({ setOpenCustomer, handleCustomerData }) => {
     try {
       const { data } = await axios.post(
         `${baseUrl}/customer/new-customer`,
-        userData
+        userData,
+        { withCredentials: true }
       );
 
       if (data && data.customer) {
+        console.log(data)
         toast.success(data.message);
         setOpenCustomer(false);
         handleCustomerData(data.customer);

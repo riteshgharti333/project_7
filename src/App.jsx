@@ -27,17 +27,11 @@ function App() {
   return (
     <div className="app">
       {/* <BrowserRouter basename="/invoice"> */}
-
       <BrowserRouter>
-
-
         <Toaster position="top-center" richColors />
         <Routes>
-          <Route
-            path="/login"
-            element={user ? <Navigate to="/" /> : <Login />}
-          />
-          <Route element={user ? <Layout /> : <Navigate to="/login" />}>
+          <Route path="/login" element={<Login />} />
+          <Route element={<Layout />}>
             <Route path="/" element={<Invoice />} />
             <Route path="/invoice" element={<Invoice />} />
             <Route path="/customer" element={<Customer />} />

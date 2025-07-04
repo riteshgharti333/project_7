@@ -444,7 +444,10 @@ const NewInvoice = () => {
 
       const { data } = await axios.post(
         `${baseUrl}/invoice/new-invoice`,
-        invoiceData
+        invoiceData,
+        {
+          withCredentials: true,
+        }
       );
 
       if (data && data.invoice) {

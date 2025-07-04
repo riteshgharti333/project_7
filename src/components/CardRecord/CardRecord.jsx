@@ -62,19 +62,25 @@ const CardRecord = ({ setCardRecordOpen, invoiceData }) => {
     setIsLoading(true);
 
     try {
-      await axios.put(`${baseUrl}/invoice/${_id}`, {
-        paymentAmount: Number(paymentAmount),
-        paymentDate,
-        paymentMode: selectedPaymentType,
-        notes: paymentNote,
-      });
+      await axios.put(
+        `${baseUrl}/invoice/${_id}`,
+        {
+          paymentAmount: Number(paymentAmount),
+          paymentDate,
+          paymentMode: selectedPaymentType,
+          notes: paymentNote,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       toast.success("Payment recorded successfully");
       setCardRecordOpen(false);
       navigate(0);
-    } catch (err) {
-      toast.error("Something went wrong while updating invoice");
-      console.error(err);
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }

@@ -42,7 +42,9 @@ const NewBank = ({ setOpenBank, handleBankData }) => {
 
     setIsLoading(true);
     try {
-      const { data } = await axios.post(`${baseUrl}/bank/new-bank`, bankData);
+      const { data } = await axios.post(`${baseUrl}/bank/new-bank`, bankData, {
+        withCredentials: true,
+      });
 
       if (data && data.bank) {
         toast.success(data.message);

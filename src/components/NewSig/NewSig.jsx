@@ -34,6 +34,7 @@ const NewSig = ({ setOpensig, handleSigData }) => {
       const { data } = await axios.post(
         `${baseUrl}/signature/new-signature`,
         formData,
+        { withCredentials: true },
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
@@ -42,8 +43,8 @@ const NewSig = ({ setOpensig, handleSigData }) => {
       toast.success("Signature added successfully!");
       handleSigData(data.signature);
       setOpensig(false);
-    } catch (err) {
-      toast.error("Upload failed. Try again.");
+    } catch (error) {
+      toast.error(error.response.data.message);
     } finally {
       setIsLoading(false);
     }

@@ -1,6 +1,6 @@
 import { User } from "lucide-react";
 import "./Navbar.scss";
-import { BiLogOut } from "react-icons/bi";
+import { BiLogIn, BiLogOut } from "react-icons/bi";
 
 import { Link, useNavigate } from "react-router-dom";
 import { baseUrl } from "../../main";
@@ -18,7 +18,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.post(`${baseUrl}/auth/logout`, {
+      const { data } = await axios.post(`${baseUrl}/auth/logout`, null, {
         withCredentials: true,
       });
 
@@ -37,14 +37,25 @@ const Navbar = () => {
   };
   return (
     <div className="navbar">
-      <Link to={"/profile"} className="navbar-left">
-        <User className="user-icon" />
-        <p>{user?.user?.name}</p>
-      </Link>
+      <div className="">
+        {user && (
+          <Link to={"/profile"} className="navbar-left">
+            <User className="user-icon" />
+            <p>{user?.user?.name}</p>
+          </Link>
+        )}
+      </div>
+
       <div className="navbar-right">
-        <Link to={"/login"} className="primary-btn" onClick={handleLogout}>
-          <BiLogOut className="login-icon" /> Logout
-        </Link>
+        {user ? (
+          <Link className="primary-btn" onClick={handleLogout}>
+            <BiLogOut className="login-icon" /> Logout
+          </Link>
+        ) : (
+          <Link to={"/login"} className="primary-btn">
+            <BiLogIn className="login-icon" /> Login
+          </Link>
+        )}
       </div>
     </div>
   );
